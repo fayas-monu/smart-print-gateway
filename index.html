@@ -3,47 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Stationery Print Portal</title>
+    <title>Pro Smart Print & Preview Gateway</title>
+    <!-- PDF.js library for fast & accurate PDF Rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; background-color: #f8f9fa; color: #333; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; background-color: #f0f2f5; color: #333; }
+        .container { max-width: 650px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; font-size: 22px; }
         .form-group { margin-bottom: 15px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 13px; color: #555; }
-        input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 13px; color: #444; }
+        input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
         
-        /* Live Preview Box */
-        .preview-container { width: 100%; height: 250px; border: 2px dashed #ccc; border-radius: 8px; background: #f1f3f4; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; margin-bottom: 15px; }
-        .preview-container img, .preview-container canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .placeholder-text { color: #888; font-size: 14px; text-align: center; }
-
-        .row { display: flex; gap: 10px; }
+        /* Interactive Preview Box */
+        .preview-header { font-weight: bold; margin-bottom: 8px; color: #1a73e8; display: flex; justify-content: space-between; align-items: center; }
+        .preview-container { width: 100%; height: 380px; border: 2px dashed #1a73e8; border-radius: 8px; background: #525659; display: flex; align-items: center; justify-content: center; overflow: auto; position: relative; margin-bottom: 10px; }
+        
+        /* B&W Live Preview Filter */
+        .grayscale-preview { filter: grayscale(100%) contrast(120%); }
+        
+        #previewCanvas, #previewImage { max-width: 95%; max-height: 95%; box-shadow: 0 0 10px rgba(0,0,0,0.5); background: white; transition: all 0.3s ease; }
+        .grid-preview-box { display: grid; gap: 8px; background: white; padding: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
+        .row { display: flex; gap: 12px; }
         .col { flex: 1; }
 
-        button { width: 100%; padding: 12px; background-color: #1a73e8; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 10px; transition: background 0.2s; }
-        button:hover { background-color: #1557b0; }
+        .page-controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 15px; background: #e9ecef; padding: 8px; border-radius: 6px; }
+        .page-btn { width: auto; padding: 6px 14px; font-size: 13px; background: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .page-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        button.submit-btn { width: 100%; padding: 14px; background-color: #28a745; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 15px; transition: background 0.2s; }
+        button.submit-btn:hover { background-color: #218838; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🖨️ Smart Print & Preview</h2>
+    <h2>🖨️ Smart Print & Preview Gateway</h2>
     
     <form id="printForm">
         <div class="form-group">
-            <label for="custName">Your Name:</label>
-            <input type="text" id="custName" required placeholder="Enter your name">
+            <label for="custName">Customer Name:</label>
+            <input type="text" id="custName" required placeholder="Enter full name">
         </div>
 
         <div class="form-group">
-            <label for="fileInput">Select File (PDF / Image):</label>
+            <label for="fileInput">Select Document / Image (PDF, JPG, PNG):</label>
             <input type="file" id="fileInput" accept=".pdf, image/*" required>
         </div>
 
-        <!-- Live Preview Screen -->
-        <label>Live Output Preview:</label>
+        <!-- Dynamic Live Preview Area -->
+        <div class="preview-header">
+            <span>Live Output Preview</span>
+            <span id="pageInfo" style="font-size: 12px; color: #666;"></span>
+        </div>
         <div class="preview-container" id="previewBox">
-            <span class="placeholder-text">Preview will appear here after selecting a file</span>
+            <span style="color: #ccc;" id="placeholderText">Upload a PDF or Image to see live preview</span>
+            <canvas id="previewCanvas" style="display:none;"></canvas>
+            <img id="previewImage" style="display:none;" alt="Preview">
+            <div id="gridPreview" class="grid-preview-box" style="display:none;"></div>
+        </div>
+
+        <!-- PDF Page Navigation Controls -->
+        <div class="page-controls" id="pdfControls" style="display:none;">
+            <button type="button" class="page-btn" id="prevPage">◀ Previous Page</button>
+            <span id="pageNumDisplay" style="font-weight:bold; font-size:14px;">Page 1</span>
+            <button type="button" class="page-btn" id="nextPage">Next Page ▶</button>
+        </div>
+
+        <!-- Custom Page Selection Option -->
+        <div class="form-group" id="pageRangeGroup">
+            <label for="pageRange">Pages to Print (PDF Range Selection):</label>
+            <input type="text" id="pageRange" placeholder="e.g. All, 5-6, 1,3,5 (Leave empty for All Pages)">
+            <small style="color:#666; font-size:11px;">Example: Type '5-6' to print only pages 5 and 6.</small>
+        </div>
+
+        <!-- Advanced Print Settings -->
+        <div class="row">
+            <div class="col form-group">
+                <label for="colorType">Print Color Mode:</label>
+                <select id="colorType">
+                    <option value="BW">Black & White</option>
+                    <option value="Color">Color</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label for="orientation">Page Orientation:</label>
+                <select id="orientation">
+                    <option value="portrait">Portrait (Vertical)</option>
+                    <option value="landscape">Landscape (Horizontal)</option>
+                </select>
+            </div>
         </div>
 
         <div class="row">
@@ -52,77 +101,186 @@
                 <input type="number" id="copies" value="1" min="1" required>
             </div>
             <div class="col form-group">
-                <label for="scale">Size / Scale (%):</label>
+                <label for="scale">Page Scale / Zoom (%):</label>
                 <select id="scale">
-                    <option value="100">100% (Normal)</option>
+                    <option value="100">100% (Actual Size)</option>
+                    <option value="fit">Fit to Printable Area</option>
                     <option value="75">75% (Shrink)</option>
-                    <option value="50">50% (Half size)</option>
-                    <option value="fit">Fit to Page</option>
+                    <option value="50">50% (Half Size)</option>
                 </select>
             </div>
         </div>
 
         <div class="row">
             <div class="col form-group">
-                <label for="colorType">Print Type:</label>
-                <select id="colorType">
-                    <option value="BW">Black & White</option>
-                    <option value="Color">Color</option>
+                <label for="layout">Layout / N-Up (Images per Sheet):</label>
+                <select id="layout">
+                    <option value="1">1 Page per Sheet</option>
+                    <option value="2">2 Pages per Sheet</option>
+                    <option value="4">4 Pages (2x2 Grid)</option>
+                    <option value="6">6 Pages per Sheet</option>
+                    <option value="9">9 Pages per Sheet</option>
                 </select>
             </div>
             <div class="col form-group">
-                <label for="layout">Paper Layout:</label>
-                <select id="layout">
-                    <option value="1">1 Image per Page</option>
-                    <option value="2">2 Images per Page</option>
-                    <option value="4">4 Images per Page (Grid)</option>
+                <label for="printSide">Paper Duplexing:</label>
+                <select id="printSide">
+                    <option value="Single">Single Sided</option>
+                    <option value="Double-Long">Double Sided (Long Edge)</option>
+                    <option value="Double-Short">Double Sided (Short Edge)</option>
                 </select>
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="printSide">Paper Side:</label>
-            <select id="printSide">
-                <option value="Single">Single Side</option>
-                <option value="Double">Double Side (Duplex)</option>
-            </select>
-        </div>
-
-        <button type="submit">Send Print Request to Counter</button>
+        <button type="submit" class="submit-btn">Send Print Job to Counter</button>
     </form>
 </div>
 
 <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
     const fileInput = document.getElementById('fileInput');
-    const previewBox = document.getElementById('previewBox');
+    const colorType = document.getElementById('colorType');
+    const orientation = document.getElementById('orientation');
+    const layout = document.getElementById('layout');
+    const scaleSelect = document.getElementById('scale');
+    const pageRangeInput = document.getElementById('pageRange');
+    
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    const previewImg = document.getElementById('previewImage');
+    const gridPreview = document.getElementById('gridPreview');
+    const placeholderText = document.getElementById('placeholderText');
+    const pdfControls = document.getElementById('pdfControls');
+    
+    let currentPdf = null;
+    let pageNum = 1;
+    let currentFile = null;
 
-    // Live preview handler for uploaded files
     fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+        currentFile = e.target.files[0];
+        if (!currentFile) return;
 
-        previewBox.innerHTML = ''; // Clear previous preview
-
-        if (file.type.startsWith('image/')) {
+        placeholderText.style.display = 'none';
+        
+        if (currentFile.type === 'application/pdf') {
+            const fileReader = new FileReader();
+            fileReader.onload = function() {
+                const typedarray = new Uint8Array(this.result);
+                pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+                    currentPdf = pdf;
+                    pageNum = 1;
+                    pdfControls.style.display = 'flex';
+                    renderPdfPage(pageNum);
+                });
+            };
+            fileReader.readAsArrayBuffer(currentFile);
+        } else if (currentFile.type.startsWith('image/')) {
+            currentPdf = null;
+            pdfControls.style.display = 'none';
             const reader = new FileReader();
             reader.onload = function(event) {
-                const img = document.createElement('img');
-                img.src = event.target.result;
-                previewBox.appendChild(img);
-            }
-            reader.readAsDataURL(file);
-        } else if (file.type === 'application/pdf') {
-            const p = document.createElement('p');
-            p.style.textAlign = 'center';
-            p.style.color = '#333';
-            p.innerHTML = `📄 <b>${file.name}</b><br><span style="font-size:12px; color:#666;">PDF file uploaded successfully. Full preview will be available in the admin panel.</span>`;
-            previewBox.appendChild(p);
+                previewImg.src = event.target.result;
+                updatePreviewDisplay();
+            };
+            reader.readAsDataURL(currentFile);
         }
     });
 
+    // Render exact PDF Page to Canvas with Page Controls
+    function renderPdfPage(num) {
+        currentPdf.getPage(num).then(page => {
+            let scaleVal = scaleSelect.value === 'fit' ? 1.0 : parseFloat(scaleSelect.value)/100;
+            let viewport = page.getViewport({ scale: scaleVal });
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = { canvasContext: ctx, viewport: viewport };
+            page.render(renderContext).promise.then(() => {
+                updatePreviewDisplay();
+            });
+            document.getElementById('pageNumDisplay').innerText = `Page ${num} of ${currentPdf.numPages}`;
+            
+            // Enable/Disable buttons based on current page
+            document.getElementById('prevPage').disabled = (num <= 1);
+            document.getElementById('nextPage').disabled = (num >= currentPdf.numPages);
+        });
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPdf && pageNum > 1) { pageNum--; renderPdfPage(pageNum); }
+    });
+    document.getElementById('nextPage').addEventListener('click', () => {
+        if (currentPdf && pageNum < currentPdf.numPages) { pageNum++; renderPdfPage(pageNum); }
+    });
+
+    // Page Range Input Jump Event
+    pageRangeInput.addEventListener('change', function() {
+        if (currentPdf) {
+            let val = this.value.trim();
+            // If user types a single page number like '5', automatically preview page 5
+            let targetPage = parseInt(val);
+            if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= currentPdf.numPages) {
+                pageNum = targetPage;
+                renderPdfPage(pageNum);
+            }
+        }
+    });
+
+    // Update Color, Orientation, and Grid Layout Live
+    function updatePreviewDisplay() {
+        const isBW = colorType.value === 'BW';
+        const orient = orientation.value;
+        const gridCount = parseInt(layout.value);
+
+        // Apply Grayscale Filter Live
+        [canvas, previewImg, gridPreview].forEach(el => {
+            if (isBW) el.classList.add('grayscale-preview');
+            else el.classList.remove('grayscale-preview');
+        });
+
+        if (currentFile && currentFile.type.startsWith('image/')) {
+            if (gridCount > 1) {
+                previewImg.style.display = 'none';
+                canvas.style.display = 'none';
+                gridPreview.style.display = 'grid';
+                gridPreview.innerHTML = '';
+                
+                let cols = gridCount === 2 ? 2 : gridCount === 4 ? 2 : 3;
+                gridPreview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                
+                for(let i=0; i<gridCount; i++) {
+                    let img = document.createElement('img');
+                    img.src = previewImg.src;
+                    img.style.width = '100%';
+                    img.style.height = orient === 'landscape' ? '60px' : '85px';
+                    img.style.objectFit = 'contain';
+                    gridPreview.appendChild(img);
+                }
+            } else {
+                gridPreview.style.display = 'none';
+                canvas.style.display = 'none';
+                previewImg.style.display = 'block';
+                previewImg.style.transform = orient === 'landscape' ? 'rotate(-90deg)' : 'none';
+            }
+        } else if (currentPdf) {
+            gridPreview.style.display = 'none';
+            previewImg.style.display = 'none';
+            canvas.style.display = 'block';
+            canvas.style.transform = orient === 'landscape' ? 'rotate(-90deg)' : 'none';
+        }
+    }
+
+    // Live Event listeners for settings change
+    colorType.addEventListener('change', updatePreviewDisplay);
+    orientation.addEventListener('change', updatePreviewDisplay);
+    layout.addEventListener('change', updatePreviewDisplay);
+    scaleSelect.addEventListener('change', () => { if (currentPdf) renderPdfPage(pageNum); });
+
     document.getElementById('printForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Your print request has been submitted successfully! Please wait at the counter.');
+        alert('Print Request submitted successfully with all configured settings!');
     });
 </script>
 
