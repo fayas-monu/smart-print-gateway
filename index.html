@@ -3,60 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Print Gateway - Enterprise Control Portal</title>
+    <title>Smart Print Gateway - Professional Enterprise Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
             --primary: #1a73e8;
-            --bg-color: #eceff1;
+            --bg-color: #f0f2f5;
             --card-bg: #ffffff;
-            --border: #cfd8dc;
-            --text: #263238;
+            --border: #dadce0;
+            --text: #202124;
         }
 
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; background-color: var(--bg-color); color: var(--text); }
-        .app-container { max-width: 1250px; margin: auto; display: grid; grid-template-columns: 500px 1fr; gap: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text); }
+        .app-container { max-width: 1300px; margin: auto; display: grid; grid-template-columns: 450px 1fr; gap: 20px; }
         @media (max-width: 950px) { .app-container { grid-template-columns: 1fr; } }
 
-        .card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary); margin-top: 0; font-size: 18px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { color: var(--primary); margin-top: 0; font-size: 18px; border-bottom: 2px solid #f1f3f4; padding-bottom: 8px; }
 
-        /* Canon Driver Style Navigation Tabs */
-        .tab-menu { display: flex; gap: 4px; background: #cfd8dc; padding: 4px; border-radius: 6px; margin-bottom: 15px; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 8px 5px; font-size: 11px; font-weight: bold; border: none; background: transparent; cursor: pointer; border-radius: 4px; text-align: center; white-space: nowrap; }
-        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* Canon Driver Style Tabs */
+        .tab-menu { display: flex; gap: 4px; background: #e8eaed; padding: 4px; border-radius: 6px; margin-bottom: 15px; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 8px 4px; font-size: 11px; font-weight: bold; border: none; background: transparent; cursor: pointer; border-radius: 4px; text-align: center; white-space: nowrap; color: #5f6368; }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .form-group { margin-bottom: 12px; }
-        label { font-weight: 600; display: block; margin-bottom: 4px; font-size: 12px; color: #455a64; }
-        input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid var(--border); box-sizing: border-box; font-size: 13px; }
+        label { font-weight: 600; display: block; margin-bottom: 4px; font-size: 12px; color: #5f6368; text-transform: uppercase; }
+        input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 9px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; font-size: 13px; background: #fff; }
 
         .row { display: flex; gap: 10px; }
         .col { flex: 1; }
 
-        /* Real-Time Live Preview Pane */
+        /* Real-Time Accurate Preview Pane */
         .preview-pane { display: flex; flex-direction: column; height: 100%; }
-        .preview-container { flex-grow: 1; min-height: 500px; border: 2px dashed var(--border); border-radius: 8px; background: #37474f; display: flex; align-items: center; justify-content: center; overflow: auto; position: relative; padding: 15px; }
+        .preview-container { flex-grow: 1; min-height: 520px; border: 2px dashed var(--border); border-radius: 8px; background: #202124; display: flex; align-items: center; justify-content: center; overflow: auto; position: relative; padding: 20px; }
 
-        .grayscale-preview { filter: grayscale(100%) contrast(120%); }
-        #previewCanvas, #previewImage { max-width: 95%; max-height: 95%; box-shadow: 0 5px 20px rgba(0,0,0,0.4); background: white; transition: all 0.3s; }
-        .grid-preview-box { display: grid; gap: 6px; background: white; padding: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
+        .grayscale-preview { filter: grayscale(100%) contrast(130%); }
+        
+        /* Dynamic Paper Sheet Preview Frame */
+        .paper-sheet { background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.3s ease; overflow: hidden; margin: auto; }
+        
+        #previewCanvas, #previewImage { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .grid-preview-box { display: grid; width: 100%; height: 100%; padding: 10px; box-sizing: border-box; gap: 5px; }
+        .grid-item { border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fafafa; }
+        .grid-item img, .grid-item canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .page-nav-bar { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; background: #eceff1; padding: 6px; border-radius: 5px; }
-        .nav-btn { padding: 5px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .page-nav-bar { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 12px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
+        .nav-btn { padding: 6px 14px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .nav-btn:disabled { background: #bdc1c6; cursor: not-allowed; }
 
-        .submit-btn { width: 100%; padding: 14px; background-color: #2e7d32; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; margin-top: 15px; text-transform: uppercase; }
-        .submit-btn:hover { background-color: #1b5e20; }
+        .submit-btn { width: 100%; padding: 14px; background-color: #28a745; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; margin-top: 15px; text-transform: uppercase; }
+        .submit-btn:hover { background-color: #218838; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Left Configuration Panel with Canon Driver Tabs -->
+    <!-- Left Configuration Panel -->
     <div class="card">
-        <h2>🖨️ Smart Print Gateway (Canon C5760i / C5550)</h2>
+        <h2>🖨️ Smart Print Gateway</h2>
         
         <form id="printForm">
             <div class="form-group">
@@ -69,41 +76,26 @@
                 <input type="file" id="fileInput" accept=".pdf, image/*" required>
             </div>
 
-            <!-- Canon Driver Tab Navigation -->
+            <!-- Canon Driver Tabs -->
             <div class="tab-menu">
-                <button type="button" class="tab-btn active" onclick="openTab(event, 'basic')">Basic Settings</button>
+                <button type="button" class="tab-btn active" onclick="openTab(event, 'basic')">Basic</button>
                 <button type="button" class="tab-btn" onclick="openTab(event, 'pageSetup')">Page Setup</button>
                 <button type="button" class="tab-btn" onclick="openTab(event, 'finishing')">Finishing</button>
-                <button type="button" class="tab-btn" onclick="openTab(event, 'paperSource')">Paper Source</button>
+                <button type="button" class="tab-btn" onclick="openTab(event, 'paperSource')">Source</button>
                 <button type="button" class="tab-btn" onclick="openTab(event, 'quality')">Quality</button>
             </div>
 
-            <!-- 1. BASIC SETTINGS TAB -->
+            <!-- 1. BASIC SETTINGS -->
             <div id="basic" class="tab-content active">
                 <div class="row">
                     <div class="col form-group">
-                        <label for="pageSize">Page Size</label>
+                        <label for="pageSize">Paper Size</label>
                         <select id="pageSize">
-                            <option value="A4">A4 (210 x 297 mm)</option>
-                            <option value="A3">A3 (297 x 420 mm)</option>
+                            <option value="A4">A4 (210x297mm)</option>
+                            <option value="A3">A3 (297x420mm)</option>
                             <option value="Letter">Letter</option>
                             <option value="Legal">Legal</option>
                         </select>
-                    </div>
-                    <div class="col form-group">
-                        <label for="outputSize">Output Size</label>
-                        <select id="outputSize">
-                            <option value="Same">Same as Page Size</option>
-                            <option value="A4">A4</option>
-                            <option value="A3">A3</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="copies">Copies [1 to 9999]</label>
-                        <input type="number" id="copies" value="1" min="1" max="9999" required>
                     </div>
                     <div class="col form-group">
                         <label for="orientation">Orientation</label>
@@ -114,121 +106,107 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="copies">Copies</label>
+                        <input type="number" id="copies" value="1" min="1" max="999" required>
+                    </div>
+                    <div class="col form-group">
+                        <label for="colorMode">Color Mode</label>
+                        <select id="colorMode">
+                            <option value="BW">Black & White</option>
+                            <option value="Color">Full Color</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label for="layout">Page Layout (N-Up)</label>
+                    <label for="layout">N-Up Layout (Pages per Sheet)</label>
                     <select id="layout">
-                        <option value="1">1 in 1 (Normal)</option>
-                        <option value="2">2 in 1 (2 Pages per Sheet)</option>
-                        <option value="4">4 in 1 (4 Pages Grid)</option>
-                        <option value="6">6 in 1</option>
-                        <option value="9">9 in 1</option>
+                        <option value="1">1 Page per Sheet (Normal)</option>
+                        <option value="2">2 Pages per Sheet</option>
+                        <option value="4">4 Pages per Sheet (2x2 Grid)</option>
+                        <option value="6">6 Pages per Sheet</option>
+                        <option value="9">9 Pages per Sheet</option>
                     </select>
                 </div>
             </div>
 
-            <!-- 2. PAGE SETUP TAB -->
+            <!-- 2. PAGE SETUP -->
             <div id="pageSetup" class="tab-content">
                 <div class="row">
                     <div class="col form-group">
-                        <label for="manualScaling">Manual Scaling Mode</label>
-                        <select id="manualScaling">
-                            <option value="auto">Fit Printable Area (Auto)</option>
-                            <option value="custom">Custom Scale (%)</option>
+                        <label for="scale">Scaling / Zoom</label>
+                        <select id="scale">
+                            <option value="100">100% (Actual)</option>
+                            <option value="fit">Fit to Page Area</option>
+                            <option value="75">75% (Shrink)</option>
+                            <option value="50">50% (Half)</option>
                         </select>
                     </div>
                     <div class="col form-group">
-                        <label for="scale">Scaling [25 to 200%]</label>
-                        <input type="number" id="scale" value="100" min="25" max="200">
+                        <label for="pageRange">Page Range</label>
+                        <input type="text" id="pageRange" placeholder="e.g. 1-5, 2, 4">
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label for="pageRange">Pages to Print (Range)</label>
-                    <input type="text" id="pageRange" placeholder="e.g. All, 1-5, 2, 4">
-                </div>
-
-                <div class="form-group">
-                    <label for="watermark">Watermark Option</label>
+                    <label for="watermark">Watermark Stamp</label>
                     <select id="watermark">
                         <option value="None">None</option>
                         <option value="CONFIDENTIAL">CONFIDENTIAL</option>
                         <option value="COPY">COPY</option>
-                        <option value="DRAFT">DRAFT</option>
                     </select>
                 </div>
             </div>
 
-            <!-- 3. FINISHING TAB -->
+            <!-- 3. FINISHING -->
             <div id="finishing" class="tab-content">
                 <div class="form-group">
-                    <label for="printStyle">Print Style (Duplex / Side)</label>
+                    <label for="printStyle">Duplex Side</label>
                     <select id="printStyle">
-                        <option value="1-sided">1-sided Printing</option>
-                        <option value="2-sided">2-sided Printing (Duplex)</option>
-                        <option value="Booklet">Booklet Printing</option>
+                        <option value="1-sided">1-Sided Printing</option>
+                        <option value="2-sided-long">2-Sided (Long Edge Binding)</option>
+                        <option value="2-sided-short">2-Sided (Short Edge Binding)</option>
                     </select>
                 </div>
-
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="bindingLocation">Binding Location</label>
-                        <select id="bindingLocation">
-                            <option value="LongEdge">Long Edge [Left]</option>
-                            <option value="ShortEdge">Short Edge [Top]</option>
-                        </select>
-                    </div>
-                    <div class="col form-group">
-                        <label for="collate">Staple / Collate</label>
-                        <select id="collate">
-                            <option value="Collate">Collate (Grouped Sets)</option>
-                            <option value="Group">Group (Same Pages)</option>
-                            <option value="Staple">Eco Staple + Collate</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="collate">Collation / Staple</label>
+                    <select id="collate">
+                        <option value="Collate">Collated (1,2,3 - 1,2,3)</option>
+                        <option value="Group">Uncollated (1,1,1 - 2,2,2)</option>
+                        <option value="EcoStaple">Eco Staple + Collate</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- 4. PAPER SOURCE TAB -->
+            <!-- 4. PAPER SOURCE -->
             <div id="paperSource" class="tab-content">
                 <div class="form-group">
-                    <label for="paperSelection">Paper Selection Source</label>
+                    <label for="paperSelection">Paper Drawer Source</label>
                     <select id="paperSelection">
-                        <option value="Auto">Auto Select (Recommended)</option>
-                        <option value="MultiPurpose">Multi-purpose Tray</option>
-                        <option value="Drawer1">Drawer 1 (A4)</option>
-                        <option value="Drawer2">Drawer 2 (A3)</option>
+                        <option value="Auto">Auto Select Tray</option>
+                        <option value="Tray1">Multi-Purpose Tray</option>
+                        <option value="Drawer1">Drawer 1 (C5550 / C5760i)</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label for="paperType">Paper Type / Thickness</label>
+                    <label for="paperType">Paper Media Type</label>
                     <select id="paperType">
-                        <option value="Plain">Plain Paper (75-80 gsm)</option>
-                        <option value="Heavy1">Heavy Paper 1 (105-176 gsm)</option>
-                        <option value="Heavy2">Heavy Paper 2 (177-220 gsm)</option>
-                        <option value="Glossy">Glossy Paper / Photo</option>
-                        <option value="Envelopes">Envelopes</option>
+                        <option value="Plain">Plain Paper (80gsm)</option>
+                        <option value="Heavy">Heavy Paper / Cardstock</option>
+                        <option value="Glossy">Glossy Photo Paper</option>
                     </select>
                 </div>
             </div>
 
-            <!-- 5. QUALITY TAB -->
+            <!-- 5. QUALITY -->
             <div id="quality" class="tab-content">
                 <div class="form-group">
-                    <label for="objective">Objective Target</label>
+                    <label for="objective">Print Objective</label>
                     <select id="objective">
-                        <option value="General">General (Documents)</option>
-                        <option value="Publications">Publications / Text & Lines</option>
-                        <option value="Graphics">Graphics / Presentations</option>
+                        <option value="General">General Document</option>
                         <option value="Photos">High Definition Photos</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="colorMode">Color Mode</label>
-                    <select id="colorMode">
-                        <option value="BW">Black and White (Grayscale)</option>
-                        <option value="Color">Full Color</option>
+                        <option value="Graphics">Graphics & Charts</option>
                     </select>
                 </div>
             </div>
@@ -237,14 +215,17 @@
         </form>
     </div>
 
-    <!-- Right Interactive Live Preview Workspace -->
+    <!-- Right Interactive Preview Pane -->
     <div class="card preview-pane">
-        <h2>Live Preview Output Screen</h2>
+        <h2>Live Enterprise Output Preview</h2>
+        
         <div class="preview-container" id="previewBox">
-            <span style="color: #b0bec5; font-size: 14px;" id="placeholderText">Upload a file to view full live preview</span>
-            <canvas id="previewCanvas" style="display:none;"></canvas>
-            <img id="previewImage" style="display:none;" alt="Preview">
-            <div id="gridPreview" class="grid-preview-box" style="display:none;"></div>
+            <span style="color: #9aa0a6; font-size: 14px;" id="placeholderText">Upload a document to view real-time layout preview</span>
+            <div class="paper-sheet" id="paperSheet" style="display:none;">
+                <canvas id="previewCanvas" style="display:none;"></canvas>
+                <img id="previewImage" style="display:none;" alt="Preview">
+                <div id="gridPreview" class="grid-preview-box" style="display:none;"></div>
+            </div>
         </div>
 
         <div class="page-nav-bar" id="pdfControls" style="display:none;">
@@ -258,7 +239,6 @@
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    // Tab Switcher Function
     function openTab(evt, tabName) {
         let contents = document.getElementsByClassName("tab-content");
         for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
@@ -272,8 +252,10 @@
     const colorMode = document.getElementById('colorMode');
     const orientation = document.getElementById('orientation');
     const layout = document.getElementById('layout');
-    const scaleInput = document.getElementById('scale');
+    const pageSize = document.getElementById('pageSize');
+    const scaleSelect = document.getElementById('scale');
     
+    const paperSheet = document.getElementById('paperSheet');
     const canvas = document.getElementById('previewCanvas');
     const ctx = canvas.getContext('2d');
     const previewImg = document.getElementById('previewImage');
@@ -290,6 +272,7 @@
         if (!currentFile) return;
 
         placeholderText.style.display = 'none';
+        paperSheet.style.display = 'flex';
         
         if (currentFile.type === 'application/pdf') {
             const fileReader = new FileReader();
@@ -317,7 +300,7 @@
 
     function renderPdfPage(num) {
         currentPdf.getPage(num).then(page => {
-            let scaleVal = parseFloat(scaleInput.value) / 100;
+            let scaleVal = scaleSelect.value === 'fit' ? 1.5 : parseFloat(scaleSelect.value)/100;
             let viewport = page.getViewport({ scale: scaleVal });
             
             canvas.height = viewport.height;
@@ -341,9 +324,24 @@
     function updatePreviewDisplay() {
         const isBW = colorMode.value === 'BW';
         const orient = orientation.value;
+        const size = pageSize.value;
         const gridCount = parseInt(layout.value);
 
-        [canvas, previewImg, gridPreview].forEach(el => {
+        // Adjust Paper Sheet Aspect Ratio based on Size & Orientation
+        let width = 300, height = 425; // Default A4 Portrait
+        if (size === 'A3') { width = 340; height = 480; }
+        else if (size === 'Letter') { width = 300; height = 390; }
+        else if (size === 'Legal') { width = 300; height = 500; }
+
+        if (orient === 'landscape') {
+            let temp = width; width = height; height = temp;
+        }
+
+        paperSheet.style.width = width + 'px';
+        paperSheet.style.height = height + 'px';
+
+        // Apply Grayscale Filter Live
+        [paperSheet].forEach(el => {
             if (isBW) el.classList.add('grayscale-preview');
             else el.classList.remove('grayscale-preview');
         });
@@ -356,39 +354,39 @@
                 gridPreview.innerHTML = '';
                 
                 let cols = gridCount === 2 ? 2 : gridCount === 4 ? 2 : 3;
+                let rows = Math.ceil(gridCount / cols);
                 gridPreview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                gridPreview.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
                 
                 for(let i=0; i<gridCount; i++) {
+                    let item = document.createElement('div');
+                    item.className = 'grid-item';
                     let img = document.createElement('img');
                     img.src = previewImg.src;
-                    img.style.width = '100%';
-                    img.style.height = orient === 'landscape' ? '75px' : '100px';
-                    img.style.objectFit = 'contain';
-                    if(isBW) img.classList.add('grayscale-preview');
-                    gridPreview.appendChild(img);
+                    item.appendChild(img);
+                    gridPreview.appendChild(item);
                 }
             } else {
                 gridPreview.style.display = 'none';
                 canvas.style.display = 'none';
                 previewImg.style.display = 'block';
-                previewImg.style.transform = orient === 'landscape' ? 'rotate(90deg)' : 'none';
             }
         } else if (currentPdf) {
             gridPreview.style.display = 'none';
             previewImg.style.display = 'none';
             canvas.style.display = 'block';
-            canvas.style.transform = orient === 'landscape' ? 'rotate(90deg)' : 'none';
         }
     }
 
     colorMode.addEventListener('change', updatePreviewDisplay);
     orientation.addEventListener('change', updatePreviewDisplay);
+    pageSize.addEventListener('change', updatePreviewDisplay);
     layout.addEventListener('change', updatePreviewDisplay);
-    scaleInput.addEventListener('change', () => { if (currentPdf) renderPdfPage(pageNum); });
+    scaleSelect.addEventListener('change', () => { if (currentPdf) renderPdfPage(pageNum); });
 
     document.getElementById('printForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Print job with full Canon driver settings submitted to counter server successfully!');
+        alert('Print job successfully transmitted with all enterprise settings!');
     });
 </script>
 
