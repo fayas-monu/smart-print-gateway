@@ -1,0 +1,115 @@
+{
+  "shop": {
+    "name": "Al Noor Print & Stationery",
+    "tagline": "Smart Print Gateway",
+    "phone": "+968 9000 0000",
+    "whatsapp": "+96890000000",
+    "email": "printdesk@example.com",
+    "address": "Shop 12, Al Khuwair, Muscat, Oman",
+    "currency": "OMR",
+    "hours": {
+      "open": "08:00",
+      "close": "22:00",
+      "timezone": "Asia/Muscat",
+      "closedDays": []
+    },
+    "welcome": "Upload your file, choose your settings and send it to the print desk. Our team will review and print it.",
+    "paymentNote": "Pay at the counter. Cash and card accepted.",
+    "pickupNote": "Please collect your prints from the counter and quote your job number."
+  },
+  "server": {
+    "port": 4173,
+    "host": "0.0.0.0",
+    "retentionDays": 30,
+    "maxFileMB": 60,
+    "maxJobMB": 180,
+    "sessionHours": 12,
+    "printMode": "simulate",
+    "defaultPrinterId": "canon-c5760i",
+    "sumatraPath": "",
+    "sofficePath": "",
+    "lpPath": "",
+    "printTimeoutSeconds": 180,
+    "autoRefreshSeconds": 15
+  },
+  "printers": [
+    {
+      "id": "canon-c5760i",
+      "name": "Canon iR-ADV C5760i",
+      "model": "imageRUNNER ADVANCE C5760i",
+      "systemName": "Canon iR-ADV C5760i",
+      "location": "Counter 1 — colour",
+      "capabilities": [
+        "color",
+        "duplex",
+        "staple",
+        "booklet",
+        "a3",
+        "1200dpi"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "canon-c5550",
+      "name": "Canon iR-ADV C5550 (B&W)",
+      "model": "imageRUNNER ADVANCE C5550",
+      "systemName": "Canon iR-ADV C5550",
+      "location": "Counter 2 — mono",
+      "capabilities": [
+        "mono",
+        "duplex",
+        "staple",
+        "booklet",
+        "a3"
+      ],
+      "enabled": true
+    }
+  ],
+  "pricing": {
+    "currency": "OMR",
+    "vatPercent": 5,
+    "minimumCharge": 0.5,
+    "rates": {
+      "bwPerA4Side": 0.025,
+      "colorPerA4Side": 0.15,
+      "sizeMultipliers": {
+        "A4": 1,
+        "A3": 2,
+        "A5": 0.7,
+        "Letter": 1,
+        "Legal": 1.3
+      },
+      "paperMultipliers": {
+        "plain": 1,
+        "recycled": 0.95,
+        "heavy1": 1.25,
+        "heavy2": 1.5,
+        "photo": 2.5,
+        "transparency": 3
+      },
+      "duplexFactor": 0.95,
+      "finishing": {
+        "collate": 0,
+        "group": 0,
+        "stapleCollate": 0.5,
+        "ecoStaple": 0.3,
+        "booklet": 0.75,
+        "fold": 0.2
+      },
+      "extras": {
+        "lamination": 0.3,
+        "cutting": 0.1,
+        "rushPercent": 20
+      }
+    }
+  },
+  "features": {
+    "exactImposition": true,
+    "colorDetection": true,
+    "chatbot": true,
+    "showPrices": true,
+    "allowRush": true,
+    "allowLamination": true,
+    "requireCustomerName": true
+  }
+}
