@@ -1,0 +1,25 @@
+{
+  "name": "smart-print-gateway",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Enterprise-grade smart print gateway and shop automation system for Canon imageRUNNER ADVANCE printers. Zero runtime dependencies.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "live": "node server.js --live",
+    "open": "node server.js --open"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "print",
+    "canon",
+    "print-shop",
+    "pdf",
+    "queue",
+    "automation"
+  ],
+  "license": "MIT"
+}
