@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070b12">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Operator Console — Smart Print Gateway</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/app.css">
+  <link rel="stylesheet" href="/assets/css/dashboard.css">
+</head>
+<body class="dash-body">
+<div class="ambient" aria-hidden="true"></div>
+
+<!-- ============================ LOGIN ============================ -->
+<section class="login-screen" id="loginScreen">
+  <div class="login-visual">
+    <a class="brand" href="/" aria-label="Smart Print Gateway home">
+      <span class="brand-mark"><span data-icon="printer" data-icon-size="21"></span></span>
+      <span class="brand-text"><strong>Smart Print</strong><small>Gateway</small></span>
+    </a>
+
+    <div class="login-copy">
+      <span class="eyebrow"><span data-icon="shield" data-icon-size="14"></span> Secure operator console</span>
+      <h1>Run the print desk<br><em>without the chaos.</em></h1>
+      <p>Review every incoming job, inspect the exact imposed sheets, accept or reject in one tap, and watch the Canon printers work through the queue.</p>
+      <ul class="login-points">
+        <li><span data-icon="zap" data-icon-size="15"></span><span><strong>Live queue</strong> with instant new-job alerts over the shop network.</span></li>
+        <li><span data-icon="eye" data-icon-size="15"></span><span><strong>Print-ready preview</strong> of the imposed PDF before anything reaches the printer.</span></li>
+        <li><span data-icon="gauge" data-icon-size="15"></span><span><strong>Diagnostics and pricing</strong> in one place, with no cloud dependency.</span></li>
+      </ul>
+    </div>
+
+    <div class="login-foot">
+      <span class="dot"></span>
+      Local-only · jobs never leave this shop
+    </div>
+  </div>
+
+  <div class="login-panel">
+    <div class="login-card">
+      <div class="login-logo"><span data-icon="printerCheck" data-icon-size="24"></span></div>
+      <h2>Operator sign in</h2>
+      <p>Enter the shop PIN to open the dashboard.</p>
+
+      <div class="pin-display" id="pinDisplay" aria-hidden="true"></div>
+
+      <form id="loginForm" autocomplete="off">
+        <label class="sr-only" for="pinInput">Operator PIN</label>
+        <input type="password" id="pinInput" class="pin-input" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="current-password" placeholder="PIN" aria-label="Operator PIN">
+        <div class="login-error" id="loginError" hidden></div>
+        <button class="btn primary block lg" id="loginBtn" type="submit" disabled>
+          <span data-icon="lock" data-icon-size="17"></span> Unlock dashboard
+        </button>
+      </form>
+
+      <div class="keypad" id="keypad" aria-label="PIN keypad">
+        <button type="button" data-key="1">1</button>
+        <button type="button" data-key="2">2</button>
+        <button type="button" data-key="3">3</button>
+        <button type="button" data-key="4">4</button>
+        <button type="button" data-key="5">5</button>
+        <button type="button" data-key="6">6</button>
+        <button type="button" data-key="7">7</button>
+        <button type="button" data-key="8">8</button>
+        <button type="button" data-key="9">9</button>
+        <button type="button" data-key="clear" class="keypad-fn">Clear</button>
+        <button type="button" data-key="0">0</button>
+        <button type="button" data-key="back" class="keypad-fn" aria-label="Delete last digit"><span data-icon="chevronLeft" data-icon-size="17"></span></button>
+      </div>
+
+      <div class="login-hint" id="loginHint">Default PIN is <strong>1234</strong> — change it in Settings → Security.</div>
+      <a href="/" class="login-back"><span data-icon="arrowLeft" data-icon-size="14"></span> Back to customer portal</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ APP ============================ -->
+<div class="dash-app" id="dashApp" hidden>
+  <div class="side-scrim" id="sideScrim" hidden></div>
+
+  <aside class="dash-side" id="dashSide">
+    <a class="brand side-brand" href="/" aria-label="Smart Print Gateway">
+      <span class="brand-mark"><span data-icon="printer" data-icon-size="20"></span></span>
+      <span class="brand-text"><strong>Smart Print</strong><small>Gateway</small></span>
+    </a>
+
+    <div class="side-shop" id="sideShop">
+      <span class="shop-dot" id="sideDot"></span>
+      <div><strong id="sideShopName">Print desk</strong><small id="sideShopMeta">Operator console</small></div>
+    </div>
+
+    <nav class="dash-nav" id="dashNav" aria-label="Console sections">
+      <button class="dash-nav-btn active" data-view="queue">
+        <span data-icon="inbox" data-icon-size="17"></span><span>Live queue</span><span class="nav-badge" id="navPending">0</span>
+      </button>
+      <button class="dash-nav-btn" data-view="history">
+        <span data-icon="history" data-icon-size="17"></span><span>Job history</span>
+      </button>
+      <button class="dash-nav-btn" data-view="printers">
+        <span data-icon="printer" data-icon-size="17"></span><span>Printers</span><span class="nav-dot" id="navPrinterDot"></span>
+      </button>
+      <button class="dash-nav-btn" data-view="stats">
+        <span data-icon="chart" data-icon-size="17"></span><span>Statistics</span>
+      </button>
+      <button class="dash-nav-btn" data-view="settings">
+        <span data-icon="settings" data-icon-size="17"></span><span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="side-foot">
+      <div class="side-status">
+        <span class="dot" id="sideStatusDot"></span>
+        <div><strong id="sideStatus">Connecting…</strong><small id="sideStatusSub">Live queue stream</small></div>
+      </div>
+      <a class="btn ghost block sm" href="/" target="_blank" rel="noopener"><span data-icon="external" data-icon-size="14"></span> Customer portal</a>
+      <div class="side-version" id="sideVersion">Smart Print Gateway</div>
+    </div>
+  </aside>
+
+  <div class="dash-main">
+    <header class="dash-top">
+      <div class="dash-heading">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open navigation"><span data-icon="menu" data-icon-size="17"></span></button>
+        <div>
+          <h1 id="viewTitle">Live queue</h1>
+          <p id="viewSubtitle">Review incoming jobs and release them to the printers.</p>
+        </div>
+      </div>
+      <div class="dash-top-actions">
+        <div class="connection-pill" id="connPill"><span class="dot"></span><span id="connText">Connecting…</span></div>
+        <button class="icon-btn" id="soundBtn" title="Sound alerts" aria-label="Toggle sound alerts"><span data-icon="volume" data-icon-size="16"></span></button>
+        <button class="icon-btn" id="notifyBtn" title="Desktop notifications" aria-label="Enable desktop notifications"><span data-icon="bell" data-icon-size="16"></span></button>
+        <button class="icon-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme"><span data-theme-icon></span></button>
+        <button class="icon-btn" id="lockBtn" title="Lock console" aria-label="Lock console"><span data-icon="lock" data-icon-size="16"></span></button>
+        <button class="btn primary sm" id="refreshBtn"><span data-icon="refresh" data-icon-size="15"></span> Refresh</button>
+      </div>
+    </header>
+
+    <div class="dash-banner" id="pinWarning" hidden>
+      <span data-icon="shield" data-icon-size="16"></span>
+      <span><strong>Default PIN in use.</strong> Change it in Settings → Operator security before the shop opens.</span>
+      <button class="btn sm ghost" id="pinWarningBtn">Open security</button>
+    </div>
+
+    <div class="dash-scroll" id="dashScroll">
+      <!-- ======================= QUEUE ======================= -->
+      <section class="view active" id="view-queue">
+        <div class="kpi-grid">
+          <div class="kpi warn">
+            <div class="kpi-icon"><span data-icon="clock" data-icon-size="18"></span></div>
+            <div><span>Awaiting approval</span><strong id="kpiPending">0</strong><small id="kpiPendingSub">No jobs waiting</small></div>
+          </div>
+          <div class="kpi accent">
+            <div class="kpi-icon"><span data-icon="printer" data-icon-size="18"></span></div>
+            <div><span>Printing now</span><strong id="kpiPrinting">0</strong><small id="kpiPrintingSub">Idle</small></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-icon"><span data-icon="inbox" data-icon-size="18"></span></div>
+            <div><span>Jobs today</span><strong id="kpiToday">0</strong><small id="kpiTodaySub">0 completed</small></div>
+          </div>
+          <div class="kpi success">
+            <div class="kpi-icon"><span data-icon="dollar" data-icon-size="18"></span></div>
+            <div><span>Revenue today</span><strong id="kpiRevenue">0.000 OMR</strong><small>Completed jobs</small></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-icon"><span data-icon="gauge" data-icon-size="18"></span></div>
+            <div><span>Average wait</span><strong id="kpiWait">0 min</strong><small>Time to acceptance</small></div>
+          </div>
+        </div>
+
+        <div class="queue-layout">
+          <div class="panel queue-panel">
+            <div class="queue-toolbar">
+              <div class="segmented queue-filter" id="statusFilter" role="tablist" aria-label="Filter jobs">
+                <button data-filter="pending" class="active" role="tab">Pending <b id="countPending">0</b></button>
+                <button data-filter="active" role="tab">Active <b id="countActive">0</b></button>
+                <button data-filter="completed" role="tab">Completed</button>
+                <button data-filter="rejected" role="tab">Rejected</button>
+                <button data-filter="all" role="tab">All</button>
+              </div>
+              <div class="queue-tools">
+                <label class="search-box">
+                  <span data-icon="search" data-icon-size="14"></span>
+                  <input type="search" id="queueSearch" placeholder="Search job, customer, phone or file" autocomplete="off">
+                </label>
+                <button class="icon-btn" id="queueExportBtn" title="Export jobs as CSV" aria-label="Export CSV"><span data-icon="download" data-icon-size="16"></span></button>
+              </div>
+            </div>
+            <div class="job-list" id="jobList"></div>
+            <div class="queue-empty" id="queueEmpty" hidden>
+              <div class="empty-illustration small"><span data-icon="inbox" data-icon-size="34"></span></div>
+              <h2 id="queueEmptyTitle">Queue is clear</h2>
+              <p id="queueEmptyText">New jobs appear here the moment a customer sends them from the portal.</p>
+            </div>
+          </div>
+
+          <aside class="queue-rail">
+            <div class="panel rail-card">
+              <div class="panel-head">
+                <div><h2>Activity</h2><p>Latest movements</p></div>
+                <button class="icon-btn sm" id="activityRefreshBtn" title="Refresh activity" aria-label="Refresh activity"><span data-icon="refresh" data-icon-size="14"></span></button>
+              </div>
+              <div class="rail-list" id="activityList"></div>
+            </div>
+            <div class="panel rail-card">
+              <div class="panel-head">
+                <div><h2>Printers</h2><p>Shop hardware</p></div>
+                <span class="badge" id="printModeBadge">SIMULATE</span>
+              </div>
+              <div class="printer-mini" id="printerMini"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ======================= HISTORY ======================= -->
+      <section class="view" id="view-history" hidden>
+        <div class="panel history-panel">
+          <div class="queue-toolbar">
+            <div class="segmented queue-filter" id="historyFilter" role="tablist" aria-label="Filter history">
+              <button data-history-filter="all" class="active" role="tab">All</button>
+              <button data-history-filter="completed" role="tab">Completed</button>
+              <button data-history-filter="rejected" role="tab">Rejected</button>
+              <button data-history-filter="failed" role="tab">Failed</button>
+              <button data-history-filter="cancelled" role="tab">Cancelled</button>
+            </div>
+            <div class="queue-tools">
+              <label class="search-box">
+                <span data-icon="search" data-icon-size="14"></span>
+                <input type="search" id="historySearch" placeholder="Search history" autocomplete="off">
+              </label>
+              <button class="btn ghost sm" id="historyExportBtn"><span data-icon="download" data-icon-size="14"></span> Export CSV</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="historyTable">
+              <thead>
+                <tr><th>Job</th><th>Created</th><th>Customer</th><th>Files</th><th>Pages</th><th>Total</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+          <div class="queue-empty" id="historyEmpty" hidden>
+            <div class="empty-illustration small"><span data-icon="history" data-icon-size="34"></span></div>
+            <h2>No jobs in this view</h2>
+            <p>Completed, rejected and cancelled jobs are kept here for reprints.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================= PRINTERS ======================= -->
+      <section class="view" id="view-printers" hidden>
+        <div class="printer-grid" id="printerGrid"></div>
+        <div class="settings-grid">
+          <div class="panel settings-section">
+            <div class="panel-head">
+              <div><h2>Print mode &amp; tools</h2><p>What the server can hand to the operating system</p></div>
+              <button class="btn ghost sm" id="diagRefreshBtn"><span data-icon="refresh" data-icon-size="14"></span> Re-scan</button>
+            </div>
+            <div class="settings-body" id="diagnosticsBody"></div>
+          </div>
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Quick controls</h2><p>Switch mode or default printer instantly</p></div></div>
+            <div class="settings-body" id="printerActions"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================= STATS ======================= -->
+      <section class="view" id="view-stats" hidden>
+        <div class="kpi-grid" id="statsKpis"></div>
+        <div class="stats-grid">
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Jobs — last 7 days</h2><p>Daily volume and completed revenue</p></div><span class="badge" id="chartTotal">0 jobs</span></div>
+            <div class="chart" id="jobsChart"></div>
+          </div>
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Paper mix</h2><p>Most-used sheet size across all jobs</p></div></div>
+            <div class="paper-mix" id="paperMix"></div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Recent activity</h2><p>Latest queue and printer events</p></div></div>
+            <div class="rail-list" id="statsActivity"></div>
+          </div>
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Operations snapshot</h2><p>Server, storage and retention</p></div></div>
+            <div class="settings-body" id="opsSummary"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================= SETTINGS ======================= -->
+      <section class="view" id="view-settings" hidden>
+        <div class="settings-actions">
+          <div>
+            <strong>Shop configuration</strong>
+            <small id="settingsSaved">Loaded from config/shop.config.json</small>
+          </div>
+          <div class="settings-actions-right">
+            <button class="btn ghost sm" id="settingsReloadBtn"><span data-icon="refresh" data-icon-size="14"></span> Reload</button>
+            <button class="btn primary" id="saveSettingsBtn"><span data-icon="check" data-icon-size="16"></span> Save changes</button>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Shop details</h2><p>Shown to customers in the portal</p></div><span class="badge accent">Customer-facing</span></div>
+            <div class="settings-body">
+              <div class="grid-2">
+                <label class="field"><span>Shop name</span><input type="text" data-setting="shop.name" maxlength="120"></label>
+                <label class="field"><span>Phone</span><input type="text" data-setting="shop.phone" maxlength="60"></label>
+              </div>
+              <div class="grid-2">
+                <label class="field"><span>WhatsApp</span><input type="text" data-setting="shop.whatsapp" maxlength="60"></label>
+                <label class="field"><span>Address</span><input type="text" data-setting="shop.address" maxlength="240"></label>
+              </div>
+              <label class="field"><span>Welcome message</span><textarea data-setting="shop.welcome" maxlength="500"></textarea></label>
+              <div class="grid-2">
+                <label class="field"><span>Payment note</span><input type="text" data-setting="shop.paymentNote" maxlength="300"></label>
+                <label class="field"><span>Pickup note</span><input type="text" data-setting="shop.pickupNote" maxlength="300"></label>
+              </div>
+              <div class="grid-3">
+                <label class="field"><span>Opens</span><input type="time" data-setting="shop.hours.open"></label>
+                <label class="field"><span>Closes</span><input type="time" data-setting="shop.hours.close"></label>
+                <label class="field"><span>Timezone</span><input type="text" data-setting="shop.hours.timezone" maxlength="60" placeholder="Asia/Muscat"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Pricing</h2><p>Shared by the portal estimate and server total</p></div><span class="badge">OMR</span></div>
+            <div class="settings-body">
+              <div class="grid-3">
+                <label class="field"><span>VAT %</span><input type="number" min="0" max="50" step="0.5" data-setting="pricing.vatPercent"></label>
+                <label class="field"><span>Minimum charge</span><input type="number" min="0" step="0.001" data-setting="pricing.minimumCharge"></label>
+                <label class="field"><span>Duplex factor</span><input type="number" min="0" max="1" step="0.01" data-setting="pricing.rates.duplexFactor"></label>
+              </div>
+              <div class="grid-2">
+                <label class="field"><span>B&amp;W per A4 side</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.bwPerA4Side"></label>
+                <label class="field"><span>Colour per A4 side</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.colorPerA4Side"></label>
+              </div>
+              <div class="form-section-title">Size multipliers</div>
+              <div class="rate-grid" id="sizeRates"></div>
+              <div class="form-section-title">Paper multipliers</div>
+              <div class="rate-grid" id="paperRates"></div>
+              <div class="form-section-title">Finishing fees</div>
+              <div class="rate-grid" id="finishRates"></div>
+              <div class="grid-2">
+                <label class="field"><span>Rush surcharge %</span><input type="number" min="0" max="100" step="1" data-setting="pricing.rates.extras.rushPercent"></label>
+                <label class="field"><span>Lamination per sheet</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.extras.lamination"></label>
+              </div>
+              <label class="field"><span>Cutting / trimming per sheet</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.extras.cutting"></label>
+            </div>
+          </div>
+
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Printing &amp; server</h2><p>Hardware hand-off and retention</p></div><span class="badge" id="serverModeBadge">SIMULATE</span></div>
+            <div class="settings-body">
+              <div class="grid-2">
+                <label class="field"><span>Print mode</span>
+                  <select data-setting="server.printMode">
+                    <option value="simulate">Simulate — safe demo</option>
+                    <option value="live">Live — send to printer</option>
+                  </select>
+                </label>
+                <label class="field"><span>Default printer</span><select data-setting="server.defaultPrinterId" id="defaultPrinterSelect"></select></label>
+              </div>
+              <div class="grid-3">
+                <label class="field"><span>Retention (days)</span><input type="number" min="1" max="3650" data-setting="server.retentionDays"></label>
+                <label class="field"><span>Max file (MB)</span><input type="number" min="1" max="500" data-setting="server.maxFileMB"></label>
+                <label class="field"><span>Max job (MB)</span><input type="number" min="1" max="1000" data-setting="server.maxJobMB"></label>
+              </div>
+              <label class="field"><span>SumatraPDF path (optional)</span><input type="text" data-setting="server.sumatraPath" placeholder="C:\\Program Files\\SumatraPDF\\SumatraPDF.exe"></label>
+              <label class="field"><span>LibreOffice soffice path (optional)</span><input type="text" data-setting="server.sofficePath" placeholder="C:\\Program Files\\LibreOffice\\program\\soffice.exe"></label>
+              <label class="field"><span>CUPS lp path (optional)</span><input type="text" data-setting="server.lpPath" placeholder="/usr/bin/lp"></label>
+              <div class="mode-note"><span data-icon="info" data-icon-size="14"></span><span>Live mode needs SumatraPDF on Windows or CUPS <code>lp</code> on Linux/macOS. LibreOffice converts Word and Excel. Keep simulate mode until a test page prints correctly.</span></div>
+            </div>
+          </div>
+
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Feature switches</h2><p>Turn portal capabilities on or off</p></div></div>
+            <div class="settings-body feature-grid">
+              <label class="switch-row"><input type="checkbox" data-setting="features.exactImposition"><span>Exact pre-imposed output</span></label>
+              <label class="switch-row"><input type="checkbox" data-setting="features.colorDetection"><span>Automatic colour detection</span></label>
+              <label class="switch-row"><input type="checkbox" data-setting="features.chatbot"><span>Print assistant</span></label>
+              <label class="switch-row"><input type="checkbox" data-setting="features.showPrices"><span>Show prices in portal</span></label>
+              <label class="switch-row"><input type="checkbox" data-setting="features.allowRush"><span>Allow rush service</span></label>
+              <label class="switch-row"><input type="checkbox" data-setting="features.allowLamination"><span>Allow lamination</span></label>
+              <label class="switch-row"><input type="checkbox" data-setting="features.requireCustomerName"><span>Require customer name</span></label>
+            </div>
+          </div>
+
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Operator security</h2><p>PIN protects this console only</p></div><span class="badge warn" id="pinStatusBadge">Default PIN</span></div>
+            <div class="settings-body">
+              <label class="field"><span>Current PIN</span><input type="password" id="currentPin" inputmode="numeric" maxlength="12" autocomplete="current-password"></label>
+              <div class="grid-2">
+                <label class="field"><span>New PIN (4–12 digits)</span><input type="password" id="newPin" inputmode="numeric" maxlength="12" autocomplete="new-password"></label>
+                <label class="field"><span>Confirm new PIN</span><input type="password" id="confirmPin" inputmode="numeric" maxlength="12" autocomplete="new-password"></label>
+              </div>
+              <button class="btn soft block" id="changePinBtn"><span data-icon="shield" data-icon-size="15"></span> Change operator PIN</button>
+              <div class="field-hint mt-8">Changing the PIN signs out every other operator session.</div>
+            </div>
+          </div>
+
+          <div class="panel settings-section">
+            <div class="panel-head"><div><h2>Data &amp; storage</h2><p>Local job store</p></div></div>
+            <div class="settings-body" id="dataBody"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ JOB DETAIL ============================ -->
+<div class="modal-backdrop" id="jobModal" hidden>
+  <div class="modal job-modal" role="dialog" aria-modal="true" aria-labelledby="jmNumber">
+    <div class="modal-head">
+      <div class="job-modal-title">
+        <div class="job-modal-no" id="jmNumber">Job</div>
+        <div id="jmStatus"></div>
+      </div>
+      <div class="job-modal-head-right">
+        <span class="small faint" id="jmCreated"></span>
+        <button class="modal-close" data-close="jobModal" aria-label="Close"><span data-icon="close"></span></button>
+      </div>
+    </div>
+    <div class="modal-body job-modal-body">
+      <div class="job-detail-grid">
+        <div class="job-preview-pane">
+          <div class="preview-toolbar">
+            <div class="segmented" id="previewKindTabs">
+              <button data-kind="printReady" class="active">Print-ready</button>
+              <button data-kind="original">Original</button>
+            </div>
+            <div class="preview-actions">
+              <button class="icon-btn sm" id="previewDownloadBtn" title="Download this file" aria-label="Download file"><span data-icon="download" data-icon-size="14"></span></button>
+              <button class="icon-btn sm" id="previewReloadBtn" title="Reload preview" aria-label="Reload preview"><span data-icon="refresh" data-icon-size="14"></span></button>
+            </div>
+          </div>
+          <div class="preview-frame" id="previewFrame"></div>
+          <div class="preview-caption" id="previewCaption">Select a document</div>
+          <div class="doc-picker" id="docPicker"></div>
+        </div>
+        <div class="job-info-pane" id="jmInfo"></div>
+      </div>
+    </div>
+    <div class="modal-foot" id="jmFoot"></div>
+  </div>
+</div>
+
+<!-- ============================ REJECT ============================ -->
+<div class="modal-backdrop" id="rejectModal" hidden>
+  <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="rejectTitle">
+    <div class="modal-head">
+      <div><h2 id="rejectTitle">Reject this job</h2><p id="rejectSubtitle">The customer sees the reason in their tracker.</p></div>
+      <button class="modal-close" data-close="rejectModal" aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="modal-body">
+      <label class="field"><span>Reason</span>
+        <select id="rejectReason">
+          <option value="File is corrupted or cannot be opened">File is corrupted or cannot be opened</option>
+          <option value="Page size or layout needs adjustment">Page size or layout needs adjustment</option>
+          <option value="Payment or price query">Payment or price query</option>
+          <option value="Duplicate job">Duplicate job</option>
+          <option value="Customer asked to cancel">Customer asked to cancel</option>
+          <option value="Other — see note">Other — see note</option>
+        </select>
+      </label>
+      <label class="field"><span>Note to customer (optional)</span><textarea id="rejectNote" maxlength="300" placeholder="e.g. Please re-upload the PDF without a password."></textarea></label>
+      <div class="field-hint">This message appears in the customer’s job tracker.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close="rejectModal">Cancel</button>
+      <div class="right"><button class="btn danger" id="confirmRejectBtn"><span data-icon="xCircle" data-icon-size="15"></span> Reject job</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="/assets/js/icons.js"></script>
+<script src="/assets/js/ui.js"></script>
+<script src="/assets/js/dashboard.js"></script>
+</body>
+</html>
