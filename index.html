@@ -1,394 +1,823 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Print Gateway - Professional Enterprise Edition</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <style>
-        :root {
-            --primary: #1a73e8;
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --border: #dadce0;
-            --text: #202124;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Print Management System</title>
+<style>
+  :root {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d2d;
+    --bg-hover: #3e3e42;
+    --accent: #007acc;
+    --accent-hover: #1c97ea;
+    --text-main: #cccccc;
+    --text-bright: #ffffff;
+    --border: #3e3e42;
+    --paper-bg: #ffffff;
+    --paper-shadow: rgba(0,0,0,0.5);
+  }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text); }
-        .app-container { max-width: 1300px; margin: auto; display: grid; grid-template-columns: 450px 1fr; gap: 20px; }
-        @media (max-width: 950px) { .app-container { grid-template-columns: 1fr; } }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; }
+  body { background-color: var(--bg-primary); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary); margin-top: 0; font-size: 18px; border-bottom: 2px solid #f1f3f4; padding-bottom: 8px; }
+  header { background-color: var(--bg-tertiary); padding: 8px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 14px; color: var(--text-bright); font-weight: 600; }
+  
+  .main-container { display: flex; flex: 1; overflow: hidden; }
+  
+  /* Left Panel: Settings */
+  .settings-panel { width: 420px; background-color: var(--bg-secondary); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  
+  .nav-tabs { display: flex; background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border); }
+  .nav-tab { padding: 8px 14px; background: none; border: none; color: var(--text-main); cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
+  .nav-tab.active { color: var(--text-bright); border-bottom-color: var(--accent); background-color: var(--bg-secondary); }
+  
+  .tab-content { flex: 1; overflow-y: auto; padding: 12px; display: none; }
+  .tab-content.active { display: block; }
 
-        /* Canon Driver Style Tabs */
-        .tab-menu { display: flex; gap: 4px; background: #e8eaed; padding: 4px; border-radius: 6px; margin-bottom: 15px; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 8px 4px; font-size: 11px; font-weight: bold; border: none; background: transparent; cursor: pointer; border-radius: 4px; text-align: center; white-space: nowrap; color: #5f6368; }
-        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .sub-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 12px; padding-bottom: 4px; }
+  .sub-tab { padding: 4px 8px; background: none; border: 1px solid transparent; color: var(--text-main); cursor: pointer; border-radius: 2px; }
+  .sub-tab.active { background-color: var(--bg-hover); color: var(--text-bright); border-color: var(--border); }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; margin-bottom: 4px; color: var(--text-main); }
+  .form-row { display: flex; gap: 8px; align-items: center; }
+  .form-row .form-group { flex: 1; margin-bottom: 0; }
+  
+  input[type="text"], input[type="number"], select { width: 100%; padding: 4px 6px; background-color: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-bright); border-radius: 2px; outline: none; }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: var(--accent); }
+  
+  .checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-bright); margin-bottom: 6px; }
+  input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
 
-        .form-group { margin-bottom: 12px; }
-        label { font-weight: 600; display: block; margin-bottom: 4px; font-size: 12px; color: #5f6368; text-transform: uppercase; }
-        input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 9px; border-radius: 6px; border: 1px solid var(--border); box-sizing: border-box; font-size: 13px; background: #fff; }
+  fieldset { border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; }
+  legend { padding: 0 4px; color: var(--text-bright); font-weight: 600; }
 
-        .row { display: flex; gap: 10px; }
-        .col { flex: 1; }
+  /* Right Panel: Preview */
+  .preview-panel { flex: 1; display: flex; flex-direction: column; background-color: #121212; position: relative; }
+  .preview-toolbar { padding: 8px 16px; background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .preview-viewport { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: auto; position: relative; }
+  
+  #previewCanvas { background-color: transparent; box-shadow: 0 4px 20px var(--paper-shadow); transition: transform 0.1s ease; }
+  
+  .page-controls { display: flex; align-items: center; gap: 8px; }
+  .btn { padding: 4px 12px; background-color: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-bright); cursor: pointer; border-radius: 2px; }
+  .btn:hover { background-color: var(--bg-hover); }
+  .btn-primary { background-color: var(--accent); border-color: var(--accent); }
+  .btn-primary:hover { background-color: var(--accent-hover); }
 
-        /* Real-Time Accurate Preview Pane */
-        .preview-pane { display: flex; flex-direction: column; height: 100%; }
-        .preview-container { flex-grow: 1; min-height: 520px; border: 2px dashed var(--border); border-radius: 8px; background: #202124; display: flex; align-items: center; justify-content: center; overflow: auto; position: relative; padding: 20px; }
-
-        .grayscale-preview { filter: grayscale(100%) contrast(130%); }
-        
-        /* Dynamic Paper Sheet Preview Frame */
-        .paper-sheet { background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.3s ease; overflow: hidden; margin: auto; }
-        
-        #previewCanvas, #previewImage { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .grid-preview-box { display: grid; width: 100%; height: 100%; padding: 10px; box-sizing: border-box; gap: 5px; }
-        .grid-item { border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fafafa; }
-        .grid-item img, .grid-item canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        .page-nav-bar { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 12px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
-        .nav-btn { padding: 6px 14px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .nav-btn:disabled { background: #bdc1c6; cursor: not-allowed; }
-
-        .submit-btn { width: 100%; padding: 14px; background-color: #28a745; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; margin-top: 15px; text-transform: uppercase; }
-        .submit-btn:hover { background-color: #218838; }
-    </style>
+  footer { background-color: var(--bg-tertiary); padding: 8px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+  
+  .disabled { opacity: 0.4; pointer-events: none; }
+</style>
 </head>
 <body>
 
-<div class="app-container">
-    <!-- Left Configuration Panel -->
-    <div class="card">
-        <h2>🖨️ Smart Print Gateway</h2>
-        
-        <form id="printForm">
-            <div class="form-group">
-                <label for="custName">Customer Full Name</label>
-                <input type="text" id="custName" required placeholder="Enter customer name">
-            </div>
+<header>
+  <h1>Print Studio - Adobe Acrobat & Canon Driver Settings</h1>
+</header>
 
-            <div class="form-group">
-                <label for="fileInput">Select File (PDF, JPG, PNG)</label>
-                <input type="file" id="fileInput" accept=".pdf, image/*" required>
-            </div>
-
-            <!-- Canon Driver Tabs -->
-            <div class="tab-menu">
-                <button type="button" class="tab-btn active" onclick="openTab(event, 'basic')">Basic</button>
-                <button type="button" class="tab-btn" onclick="openTab(event, 'pageSetup')">Page Setup</button>
-                <button type="button" class="tab-btn" onclick="openTab(event, 'finishing')">Finishing</button>
-                <button type="button" class="tab-btn" onclick="openTab(event, 'paperSource')">Source</button>
-                <button type="button" class="tab-btn" onclick="openTab(event, 'quality')">Quality</button>
-            </div>
-
-            <!-- 1. BASIC SETTINGS -->
-            <div id="basic" class="tab-content active">
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="pageSize">Paper Size</label>
-                        <select id="pageSize">
-                            <option value="A4">A4 (210x297mm)</option>
-                            <option value="A3">A3 (297x420mm)</option>
-                            <option value="Letter">Letter</option>
-                            <option value="Legal">Legal</option>
-                        </select>
-                    </div>
-                    <div class="col form-group">
-                        <label for="orientation">Orientation</label>
-                        <select id="orientation">
-                            <option value="portrait">Portrait</option>
-                            <option value="landscape">Landscape</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="copies">Copies</label>
-                        <input type="number" id="copies" value="1" min="1" max="999" required>
-                    </div>
-                    <div class="col form-group">
-                        <label for="colorMode">Color Mode</label>
-                        <select id="colorMode">
-                            <option value="BW">Black & White</option>
-                            <option value="Color">Full Color</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="layout">N-Up Layout (Pages per Sheet)</label>
-                    <select id="layout">
-                        <option value="1">1 Page per Sheet (Normal)</option>
-                        <option value="2">2 Pages per Sheet</option>
-                        <option value="4">4 Pages per Sheet (2x2 Grid)</option>
-                        <option value="6">6 Pages per Sheet</option>
-                        <option value="9">9 Pages per Sheet</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 2. PAGE SETUP -->
-            <div id="pageSetup" class="tab-content">
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="scale">Scaling / Zoom</label>
-                        <select id="scale">
-                            <option value="100">100% (Actual)</option>
-                            <option value="fit">Fit to Page Area</option>
-                            <option value="75">75% (Shrink)</option>
-                            <option value="50">50% (Half)</option>
-                        </select>
-                    </div>
-                    <div class="col form-group">
-                        <label for="pageRange">Page Range</label>
-                        <input type="text" id="pageRange" placeholder="e.g. 1-5, 2, 4">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="watermark">Watermark Stamp</label>
-                    <select id="watermark">
-                        <option value="None">None</option>
-                        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
-                        <option value="COPY">COPY</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 3. FINISHING -->
-            <div id="finishing" class="tab-content">
-                <div class="form-group">
-                    <label for="printStyle">Duplex Side</label>
-                    <select id="printStyle">
-                        <option value="1-sided">1-Sided Printing</option>
-                        <option value="2-sided-long">2-Sided (Long Edge Binding)</option>
-                        <option value="2-sided-short">2-Sided (Short Edge Binding)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="collate">Collation / Staple</label>
-                    <select id="collate">
-                        <option value="Collate">Collated (1,2,3 - 1,2,3)</option>
-                        <option value="Group">Uncollated (1,1,1 - 2,2,2)</option>
-                        <option value="EcoStaple">Eco Staple + Collate</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 4. PAPER SOURCE -->
-            <div id="paperSource" class="tab-content">
-                <div class="form-group">
-                    <label for="paperSelection">Paper Drawer Source</label>
-                    <select id="paperSelection">
-                        <option value="Auto">Auto Select Tray</option>
-                        <option value="Tray1">Multi-Purpose Tray</option>
-                        <option value="Drawer1">Drawer 1 (C5550 / C5760i)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="paperType">Paper Media Type</label>
-                    <select id="paperType">
-                        <option value="Plain">Plain Paper (80gsm)</option>
-                        <option value="Heavy">Heavy Paper / Cardstock</option>
-                        <option value="Glossy">Glossy Photo Paper</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 5. QUALITY -->
-            <div id="quality" class="tab-content">
-                <div class="form-group">
-                    <label for="objective">Print Objective</label>
-                    <select id="objective">
-                        <option value="General">General Document</option>
-                        <option value="Photos">High Definition Photos</option>
-                        <option value="Graphics">Graphics & Charts</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="submit" class="submit-btn">Send Print Job to Counter</button>
-        </form>
+<div class="main-container">
+  <!-- Left Side: Controls -->
+  <div class="settings-panel">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="acrobat">Adobe Acrobat</button>
+      <button class="nav-tab" data-tab="canon">Canon Properties</button>
     </div>
 
-    <!-- Right Interactive Preview Pane -->
-    <div class="card preview-pane">
-        <h2>Live Enterprise Output Preview</h2>
-        
-        <div class="preview-container" id="previewBox">
-            <span style="color: #9aa0a6; font-size: 14px;" id="placeholderText">Upload a document to view real-time layout preview</span>
-            <div class="paper-sheet" id="paperSheet" style="display:none;">
-                <canvas id="previewCanvas" style="display:none;"></canvas>
-                <img id="previewImage" style="display:none;" alt="Preview">
-                <div id="gridPreview" class="grid-preview-box" style="display:none;"></div>
-            </div>
+    <!-- TAB: ADOBE ACROBAT -->
+    <div id="acrobat" class="tab-content active">
+      <fieldset>
+        <legend>Printer & Range</legend>
+        <div class="form-group">
+          <label for="printerSelect">Printer</label>
+          <select id="printerSelect">
+            <option value="Canon iR-ADV C5550 III">Canon iR-ADV C5550 III</option>
+            <option value="Canon 5760">Canon 5760</option>
+            <option value="Microsoft Print to PDF">Microsoft Print to PDF</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pages to Print</label>
+          <div class="form-row" style="margin-bottom: 4px;">
+            <label class="checkbox-label"><input type="radio" name="pageRangeType" value="all" checked> All</label>
+            <label class="checkbox-label"><input type="radio" name="pageRangeType" value="current"> Current</label>
+            <label class="checkbox-label"><input type="radio" name="pageRangeType" value="pages"> Pages</label>
+          </div>
+          <input type="text" id="pageRangeInput" value="1-8" disabled placeholder="e.g. 1-5, 8, 11-13">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Page Sizing & Handling</legend>
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subtab="size">Size</button>
+          <button class="sub-tab" data-subtab="poster">Poster</button>
+          <button class="sub-tab" data-subtab="multiple">Multiple</button>
+          <button class="sub-tab" data-subtab="booklet">Booklet</button>
         </div>
 
-        <div class="page-nav-bar" id="pdfControls" style="display:none;">
-            <button type="button" class="nav-btn" id="prevPage">◀ Prev Page</button>
-            <span id="pageNumDisplay" style="font-weight:bold; font-size:13px;">Page 1</span>
-            <button type="button" class="nav-btn" id="nextPage">Next Page ▶</button>
+        <!-- Mode: Size -->
+        <div id="mode-size" class="mode-content">
+          <label class="checkbox-label"><input type="radio" name="sizeMode" value="fit" checked> Fit</label>
+          <label class="checkbox-label"><input type="radio" name="sizeMode" value="actual"> Actual size</label>
+          <label class="checkbox-label"><input type="radio" name="sizeMode" value="shrink"> Shrink oversized pages</label>
+          <label class="checkbox-label"><input type="radio" name="sizeMode" value="custom"> Custom Scale:</label>
+          <div class="form-row" style="padding-left: 20px; margin-bottom: 8px;">
+            <input type="number" id="customScaleInput" value="100" min="25" max="400" disabled>%
+          </div>
+          <label class="checkbox-label"><input type="checkbox" id="chooseSourceByPdf"> Choose paper source by PDF page size</label>
         </div>
+
+        <!-- Mode: Poster -->
+        <div id="mode-poster" class="mode-content" style="display:none;">
+          <div class="form-group">
+            <label for="tileScale">Tile Scale (%)</label>
+            <input type="number" id="tileScale" value="100" min="10" max="1000">
+          </div>
+          <div class="form-group">
+            <label for="overlapInput">Overlap (inches)</label>
+            <input type="number" id="overlapInput" value="0.00" step="0.01">
+          </div>
+          <label class="checkbox-label"><input type="checkbox" id="cutMarks"> Cut marks</label>
+          <label class="checkbox-label"><input type="checkbox" id="labels"> Labels</label>
+        </div>
+
+        <!-- Mode: Multiple -->
+        <div id="mode-multiple" class="mode-content" style="display:none;">
+          <div class="form-group">
+            <label for="pagesPerSheet">Pages per sheet</label>
+            <select id="pagesPerSheet">
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="9">9</option>
+              <option value="16">16</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </div>
+          <div id="customNupRow" class="form-row" style="display:none; margin-bottom: 8px;">
+            <div class="form-group">
+              <label>Pages by</label>
+              <input type="number" id="customNupCols" value="2" min="1" max="8">
+            </div>
+            <div class="form-group">
+              <label>by</label>
+              <input type="number" id="customNupRows" value="2" min="1" max="8">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pageOrder">Page order</label>
+            <select id="pageOrder">
+              <option value="horizontal">Horizontal</option>
+              <option value="horizontalReversed">Horizontal Reversed</option>
+              <option value="vertical">Vertical</option>
+              <option value="verticalReversed">Vertical Reversed</option>
+            </select>
+          </div>
+          <label class="checkbox-label"><input type="checkbox" id="printPageBorder"> Print page border</label>
+        </div>
+
+        <!-- Mode: Booklet -->
+        <div id="mode-booklet" class="mode-content" style="display:none;">
+          <div class="form-group">
+            <label for="bookletSubset">Booklet subset</label>
+            <select id="bookletSubset">
+              <option value="both">Both sides</option>
+              <option value="front">Front side only</option>
+              <option value="back">Back side only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="bookletBinding">Binding</label>
+            <select id="bookletBinding">
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+              <option value="leftTall">Left (Tall)</option>
+              <option value="rightTall">Right (Tall)</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Orientation</legend>
+        <label class="checkbox-label"><input type="radio" name="orientation" value="auto" checked> Auto-rotate pages within each sheet</label>
+        <label class="checkbox-label"><input type="radio" name="orientation" value="portrait"> Portrait</label>
+        <label class="checkbox-label"><input type="radio" name="orientation" value="landscape"> Landscape</label>
+      </fieldset>
     </div>
+
+    <!-- TAB: CANON DRIVER -->
+    <div id="canon" class="tab-content">
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-canontab="basic">Basic Settings</button>
+        <button class="sub-tab" data-canontab="finishing">Finishing</button>
+        <button class="sub-tab" data-canontab="paper">Paper Source</button>
+        <button class="sub-tab" data-canontab="quality">Quality</button>
+      </div>
+
+      <!-- Canon: Basic Settings -->
+      <div id="canon-basic" class="canon-tab-content">
+        <div class="form-group">
+          <label for="pageSize">Page Size</label>
+          <select id="pageSize">
+            <option value="A4">A4</option>
+            <option value="A3">A3</option>
+            <option value="A5">A5</option>
+            <option value="Letter">Letter</option>
+            <option value="Legal">Legal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="outputSize">Output Size</label>
+          <select id="outputSize">
+            <option value="same">Match Page Size</option>
+            <option value="A4">A4</option>
+            <option value="A5">A5</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="copiesInput">Copies (1-9999)</label>
+          <input type="number" id="copiesInput" value="1" min="1" max="9999">
+        </div>
+        <div class="form-group">
+          <label for="canonOrientation">Orientation</label>
+          <select id="canonOrientation">
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="canonPageLayout">Page Layout</label>
+          <select id="canonPageLayout">
+            <option value="1">1 on 1</option>
+            <option value="2">2 on 1</option>
+            <option value="4">4 on 1</option>
+            <option value="6">6 on 1</option>
+            <option value="8">8 on 1</option>
+            <option value="9">9 on 1</option>
+            <option value="16">16 on 1</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="colorMode">Color Mode</label>
+          <select id="colorMode">
+            <option value="color">Auto [Color/B&W]</option>
+            <option value="bw">Black and White</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Canon: Finishing -->
+      <div id="canon-finishing" class="canon-tab-content" style="display:none;">
+        <div class="form-group">
+          <label for="printStyle">Print Style</label>
+          <select id="printStyle">
+            <option value="1sided">1-sided Printing</option>
+            <option value="2sided">2-sided Printing</option>
+            <option value="booklet">Booklet Printing</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bindingLocation">Binding Location</label>
+          <select id="bindingLocation">
+            <option value="longEdgeLeft">Long Edge [Left]</option>
+            <option value="longEdgeRight">Long Edge [Right]</option>
+            <option value="shortEdgeTop">Short Edge [Top]</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="stapleCollate">Staple / Collate</label>
+          <select id="stapleCollate">
+            <option value="collate">Collate</option>
+            <option value="group">Group</option>
+            <option value="stapleCollate">Staple + Collate</option>
+            <option value="ecoStaple">Eco (Staple-Free) + Collate</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Canon: Paper Source -->
+      <div id="canon-paper" class="canon-tab-content" style="display:none;">
+        <div class="form-group">
+          <label for="paperSelection">Paper Selection</label>
+          <select id="paperSelection">
+            <option value="auto">Auto</option>
+            <option value="drawer1">Drawer 1</option>
+            <option value="drawer2">Drawer 2</option>
+            <option value="multi">Multi-purpose Tray</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="paperType">Paper Type</label>
+          <select id="paperType">
+            <option value="auto">Auto</option>
+            <option value="plain">Plain (64-105 g/m²)</option>
+            <option value="heavy1">Heavy 1 (106-150 g/m²)</option>
+            <option value="heavy2">Heavy 2 (151-220 g/m²)</option>
+            <option value="photo">Photo Paper</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Canon: Quality -->
+      <div id="canon-quality" class="canon-tab-content" style="display:none;">
+        <div class="form-group">
+          <label for="objectiveTarget">Objective</label>
+          <select id="objectiveTarget">
+            <option value="general">General</option>
+            <option value="publications">Publications</option>
+            <option value="graphics">Graphics</option>
+            <option value="vivid">Vivid Photo</option>
+            <option value="cad">Designs [CAD]</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="resolution">Resolution</label>
+          <select id="resolution">
+            <option value="600">600 dpi</option>
+            <option value="1200">1200 dpi</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Live Canvas Preview -->
+  <div class="preview-panel">
+    <div class="preview-toolbar">
+      <div class="page-controls">
+        <button class="btn" id="prevSheetBtn">&lt;</button>
+        <span id="sheetTracker">Sheet 1 of 1</span>
+        <button class="btn" id="nextSheetBtn">&gt;</button>
+      </div>
+      <div>
+        <label class="checkbox-label" style="display:inline-flex;">
+          <input type="checkbox" id="fitToFrameCheck"> Fit picture to frame
+        </label>
+      </div>
+    </div>
+    
+    <div class="preview-viewport">
+      <canvas id="previewCanvas" width="400" height="565"></canvas>
+    </div>
+  </div>
 </div>
 
+<footer>
+  <button class="btn" id="exportBtn">Export Config to JSON</button>
+  <button class="btn btn-primary" id="printBtn">Send to Python Backend</button>
+</footer>
+
 <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+/**
+ * Application State Architecture
+ */
+const state = {
+  activeSizingMode: 'size', // 'size' | 'poster' | 'multiple' | 'booklet'
+  
+  printer: 'Canon iR-ADV C5550 III',
+  pageRangeType: 'all',
+  pageRangeInput: '1-8',
+  sizeMode: 'fit', // 'fit', 'actual', 'shrink', 'custom'
+  customScale: 100,
+  chooseSourceByPdf: false,
+  
+  tileScale: 100,
+  overlap: 0.00,
+  cutMarks: false,
+  labels: false,
+  
+  pagesPerSheet: '2',
+  customNupCols: 2,
+  customNupRows: 2,
+  pageOrder: 'horizontal',
+  printPageBorder: false,
+  
+  bookletSubset: 'both',
+  bookletBinding: 'left',
 
-    function openTab(evt, tabName) {
-        let contents = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
-        let btns = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < btns.length; i++) btns[i].classList.remove("active");
-        document.getElementById(tabName).classList.add("active");
-        evt.currentTarget.classList.add("active");
+  orientation: 'auto', // 'auto', 'portrait', 'landscape'
+
+  canon: {
+    pageSize: 'A4',
+    outputSize: 'same',
+    copies: 1,
+    orientation: 'portrait',
+    pageLayout: '1',
+    colorMode: 'color',
+    printStyle: '1sided', // '1sided', '2sided', 'booklet'
+    bindingLocation: 'longEdgeLeft',
+    stapleCollate: 'collate',
+    paperSelection: 'auto',
+    paperType: 'auto',
+    objective: 'general',
+    resolution: '600'
+  },
+  
+  parsedPages: [1, 2, 3, 4, 5, 6, 7, 8],
+  currentSheetIndex: 0,
+  totalSheets: 1,
+  fitToFrame: false
+};
+
+/**
+ * UI Event Listeners & Binding
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  initTabs();
+  bindInputs();
+  evaluateStateDependencies();
+  renderPreview();
+});
+
+function initTabs() {
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById(e.target.dataset.tab).classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('[data-subtab]').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('[data-subtab]').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      const mode = e.target.dataset.subtab;
+      state.activeSizingMode = mode;
+      
+      document.querySelectorAll('.mode-content').forEach(el => el.style.display = 'none');
+      document.getElementById(`mode-${mode}`).style.display = 'block';
+      
+      evaluateStateDependencies();
+      renderPreview();
+    });
+  });
+
+  document.querySelectorAll('[data-canontab]').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('[data-canontab]').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      const tabKey = e.target.dataset.canontab;
+      document.querySelectorAll('.canon-tab-content').forEach(el => el.style.display = 'none');
+      document.getElementById(`canon-${tabKey}`).style.display = 'block';
+    });
+  });
+}
+
+function bindInputs() {
+  document.getElementById('printerSelect').addEventListener('change', (e) => {
+    state.printer = e.target.value;
+  });
+
+  document.querySelectorAll('input[name="pageRangeType"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      state.pageRangeType = e.target.value;
+      const input = document.getElementById('pageRangeInput');
+      input.disabled = state.pageRangeType !== 'pages';
+      parsePageRange();
+      evaluateStateDependencies();
+      renderPreview();
+    });
+  });
+
+  document.getElementById('pageRangeInput').addEventListener('input', (e) => {
+    state.pageRangeInput = e.target.value;
+    parsePageRange();
+    evaluateStateDependencies();
+    renderPreview();
+  });
+
+  document.querySelectorAll('input[name="sizeMode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      state.sizeMode = e.target.value;
+      document.getElementById('customScaleInput').disabled = state.sizeMode !== 'custom';
+      renderPreview();
+    });
+  });
+
+  document.getElementById('customScaleInput').addEventListener('input', (e) => {
+    state.customScale = parseFloat(e.target.value) || 100;
+    renderPreview();
+  });
+
+  document.getElementById('pagesPerSheet').addEventListener('change', (e) => {
+    state.pagesPerSheet = e.target.value;
+    document.getElementById('customNupRow').style.display = state.pagesPerSheet === 'custom' ? 'flex' : 'none';
+    evaluateStateDependencies();
+    renderPreview();
+  });
+
+  document.getElementById('customNupCols').addEventListener('input', (e) => {
+    state.customNupCols = parseInt(e.target.value) || 1;
+    evaluateStateDependencies();
+    renderPreview();
+  });
+
+  document.getElementById('customNupRows').addEventListener('input', (e) => {
+    state.customNupRows = parseInt(e.target.value) || 1;
+    evaluateStateDependencies();
+    renderPreview();
+  });
+
+  document.getElementById('pageOrder').addEventListener('change', (e) => {
+    state.pageOrder = e.target.value;
+    renderPreview();
+  });
+
+  document.getElementById('printPageBorder').addEventListener('change', (e) => {
+    state.printPageBorder = e.target.checked;
+    renderPreview();
+  });
+
+  document.querySelectorAll('input[name="orientation"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      state.orientation = e.target.value;
+      renderPreview();
+    });
+  });
+
+  document.getElementById('printStyle').addEventListener('change', (e) => {
+    state.canon.printStyle = e.target.value;
+    if (state.canon.printStyle === 'booklet') {
+      switchAcrobatMode('booklet');
+    }
+    evaluateStateDependencies();
+    renderPreview();
+  });
+
+  document.getElementById('canonPageLayout').addEventListener('change', (e) => {
+    state.canon.pageLayout = e.target.value;
+    if (state.canon.pageLayout !== '1') {
+      switchAcrobatMode('multiple');
+      document.getElementById('pagesPerSheet').value = state.canon.pageLayout;
+      state.pagesPerSheet = state.canon.pageLayout;
+    }
+    evaluateStateDependencies();
+    renderPreview();
+  });
+
+  document.getElementById('colorMode').addEventListener('change', (e) => {
+    state.canon.colorMode = e.target.value;
+    renderPreview();
+  });
+
+  document.getElementById('prevSheetBtn').addEventListener('click', () => {
+    if (state.currentSheetIndex > 0) {
+      state.currentSheetIndex--;
+      renderPreview();
+    }
+  });
+
+  document.getElementById('nextSheetBtn').addEventListener('click', () => {
+    if (state.currentSheetIndex < state.totalSheets - 1) {
+      state.currentSheetIndex++;
+      renderPreview();
+    }
+  });
+
+  document.getElementById('fitToFrameCheck').addEventListener('change', (e) => {
+    state.fitToFrame = e.target.checked;
+    renderPreview();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', exportConfiguration);
+  document.getElementById('printBtn').addEventListener('click', exportConfiguration);
+}
+
+function switchAcrobatMode(mode) {
+  state.activeSizingMode = mode;
+  document.querySelectorAll('[data-subtab]').forEach(t => {
+    t.classList.toggle('active', t.dataset.subtab === mode);
+  });
+  document.querySelectorAll('.mode-content').forEach(el => el.style.display = 'none');
+  document.getElementById(`mode-${mode}`).style.display = 'block';
+}
+
+function evaluateStateDependencies() {
+  if (state.activeSizingMode === 'booklet') {
+    state.canon.printStyle = 'booklet';
+    document.getElementById('printStyle').value = 'booklet';
+  }
+
+  let cols = 1, rows = 1;
+  if (state.activeSizingMode === 'multiple') {
+    if (state.pagesPerSheet === 'custom') {
+      cols = state.customNupCols;
+      rows = state.customNupRows;
+    } else {
+      const n = parseInt(state.pagesPerSheet);
+      if (n === 2) { cols = 2; rows = 1; }
+      else if (n === 4) { cols = 2; rows = 2; }
+      else if (n === 6) { cols = 3; rows = 2; }
+      else if (n === 9) { cols = 3; rows = 3; }
+      else if (n === 16) { cols = 4; rows = 4; }
+    }
+  } else if (state.activeSizingMode === 'booklet') {
+    cols = 2; rows = 1;
+  }
+
+  const pagesPerSheetCount = cols * rows;
+  state.totalSheets = Math.ceil(state.parsedPages.length / pagesPerSheetCount) || 1;
+  
+  if (state.currentSheetIndex >= state.totalSheets) {
+    state.currentSheetIndex = state.totalSheets - 1;
+  }
+  if (state.currentSheetIndex < 0) state.currentSheetIndex = 0;
+
+  document.getElementById('sheetTracker').innerText = `Sheet ${state.currentSheetIndex + 1} of ${state.totalSheets}`;
+}
+
+function parsePageRange() {
+  if (state.pageRangeType === 'all') {
+    state.parsedPages = [1, 2, 3, 4, 5, 6, 7, 8];
+  } else if (state.pageRangeType === 'current') {
+    state.parsedPages = [1];
+  } else {
+    const list = [];
+    const parts = state.pageRangeInput.split(',');
+    for (let part of parts) {
+      if (part.includes('-')) {
+        const [start, end] = part.split('-').map(n => parseInt(n.trim()));
+        if (!isNaN(start) && !isNaN(end)) {
+          for (let i = start; i <= end; i++) list.push(i);
+        }
+      } else {
+        const val = parseInt(part.trim());
+        if (!isNaN(val)) list.push(val);
+      }
+    }
+    state.parsedPages = list.length > 0 ? list : [1];
+  }
+}
+
+function renderPreview() {
+  const canvas = document.getElementById('previewCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let isLandscape = state.orientation === 'landscape';
+  if (state.orientation === 'auto' && state.activeSizingMode === 'multiple') {
+    if (state.pagesPerSheet === '2') isLandscape = true;
+  }
+
+  const baseWidth = 400;
+  const baseHeight = 565;
+
+  canvas.width = isLandscape ? baseHeight : baseWidth;
+  canvas.height = isLandscape ? baseWidth : baseHeight;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (state.canon.colorMode === 'bw') {
+    ctx.filter = 'grayscale(100%)';
+  } else {
+    ctx.filter = 'none';
+  }
+
+  let cols = 1, rows = 1;
+  if (state.activeSizingMode === 'multiple') {
+    if (state.pagesPerSheet === 'custom') {
+      cols = state.customNupCols;
+      rows = state.customNupRows;
+    } else {
+      const n = parseInt(state.pagesPerSheet);
+      if (n === 2) { cols = 2; rows = 1; }
+      else if (n === 4) { cols = 2; rows = 2; }
+      else if (n === 6) { cols = 3; rows = 2; }
+      else if (n === 9) { cols = 3; rows = 3; }
+      else if (n === 16) { cols = 4; rows = 4; }
+    }
+  } else if (state.activeSizingMode === 'booklet') {
+    cols = 2;
+    rows = 1;
+  }
+
+  const cellWidth = canvas.width / cols;
+  const cellHeight = canvas.height / rows;
+  const pps = cols * rows;
+
+  const startIndex = state.currentSheetIndex * pps;
+  const pageIndices = getMappedPageIndices(startIndex, pps, cols, rows);
+
+  for (let i = 0; i < pageIndices.length; i++) {
+    const pageNum = state.parsedPages[pageIndices[i]];
+    if (pageNum === undefined) continue;
+
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+    const x = col * cellWidth;
+    const y = row * cellHeight;
+
+    drawPageMock(ctx, pageNum, x, y, cellWidth, cellHeight);
+  }
+}
+
+function getMappedPageIndices(startIndex, count, cols, rows) {
+  let indices = [];
+  for (let i = 0; i < count; i++) indices.push(startIndex + i);
+
+  if (state.activeSizingMode === 'multiple') {
+    const grid = [];
+    for (let r = 0; r < rows; r++) {
+      grid[r] = [];
+      for (let c = 0; c < cols; c++) grid[r][c] = null;
     }
 
-    const fileInput = document.getElementById('fileInput');
-    const colorMode = document.getElementById('colorMode');
-    const orientation = document.getElementById('orientation');
-    const layout = document.getElementById('layout');
-    const pageSize = document.getElementById('pageSize');
-    const scaleSelect = document.getElementById('scale');
-    
-    const paperSheet = document.getElementById('paperSheet');
-    const canvas = document.getElementById('previewCanvas');
-    const ctx = canvas.getContext('2d');
-    const previewImg = document.getElementById('previewImage');
-    const gridPreview = document.getElementById('gridPreview');
-    const placeholderText = document.getElementById('placeholderText');
-    const pdfControls = document.getElementById('pdfControls');
-    
-    let currentPdf = null;
-    let pageNum = 1;
-    let currentFile = null;
-
-    fileInput.addEventListener('change', function(e) {
-        currentFile = e.target.files[0];
-        if (!currentFile) return;
-
-        placeholderText.style.display = 'none';
-        paperSheet.style.display = 'flex';
-        
-        if (currentFile.type === 'application/pdf') {
-            const fileReader = new FileReader();
-            fileReader.onload = function() {
-                const typedarray = new Uint8Array(this.result);
-                pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-                    currentPdf = pdf;
-                    pageNum = 1;
-                    pdfControls.style.display = 'flex';
-                    renderPdfPage(pageNum);
-                });
-            };
-            fileReader.readAsArrayBuffer(currentFile);
-        } else if (currentFile.type.startsWith('image/')) {
-            currentPdf = null;
-            pdfControls.style.display = 'none';
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                previewImg.src = event.target.result;
-                updatePreviewDisplay();
-            };
-            reader.readAsDataURL(currentFile);
-        }
-    });
-
-    function renderPdfPage(num) {
-        currentPdf.getPage(num).then(page => {
-            let scaleVal = scaleSelect.value === 'fit' ? 1.5 : parseFloat(scaleSelect.value)/100;
-            let viewport = page.getViewport({ scale: scaleVal });
-            
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            const renderContext = { canvasContext: ctx, viewport: viewport };
-            page.render(renderContext).promise.then(() => {
-                updatePreviewDisplay();
-            });
-            document.getElementById('pageNumDisplay').innerText = `Page ${num} of ${currentPdf.numPages}`;
-        });
+    let p = 0;
+    if (state.pageOrder === 'horizontal') {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) grid[r][c] = indices[p++];
+      }
+    } else if (state.pageOrder === 'vertical') {
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) grid[r][c] = indices[p++];
+      }
     }
 
-    document.getElementById('prevPage').addEventListener('click', () => {
-        if (currentPdf && pageNum > 1) { pageNum--; renderPdfPage(pageNum); }
-    });
-    document.getElementById('nextPage').addEventListener('click', () => {
-        if (currentPdf && pageNum < currentPdf.numPages) { pageNum++; renderPdfPage(pageNum); }
-    });
-
-    function updatePreviewDisplay() {
-        const isBW = colorMode.value === 'BW';
-        const orient = orientation.value;
-        const size = pageSize.value;
-        const gridCount = parseInt(layout.value);
-
-        // Adjust Paper Sheet Aspect Ratio based on Size & Orientation
-        let width = 300, height = 425; // Default A4 Portrait
-        if (size === 'A3') { width = 340; height = 480; }
-        else if (size === 'Letter') { width = 300; height = 390; }
-        else if (size === 'Legal') { width = 300; height = 500; }
-
-        if (orient === 'landscape') {
-            let temp = width; width = height; height = temp;
-        }
-
-        paperSheet.style.width = width + 'px';
-        paperSheet.style.height = height + 'px';
-
-        // Apply Grayscale Filter Live
-        [paperSheet].forEach(el => {
-            if (isBW) el.classList.add('grayscale-preview');
-            else el.classList.remove('grayscale-preview');
-        });
-
-        if (currentFile && currentFile.type.startsWith('image/')) {
-            if (gridCount > 1) {
-                previewImg.style.display = 'none';
-                canvas.style.display = 'none';
-                gridPreview.style.display = 'grid';
-                gridPreview.innerHTML = '';
-                
-                let cols = gridCount === 2 ? 2 : gridCount === 4 ? 2 : 3;
-                let rows = Math.ceil(gridCount / cols);
-                gridPreview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                gridPreview.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-                
-                for(let i=0; i<gridCount; i++) {
-                    let item = document.createElement('div');
-                    item.className = 'grid-item';
-                    let img = document.createElement('img');
-                    img.src = previewImg.src;
-                    item.appendChild(img);
-                    gridPreview.appendChild(item);
-                }
-            } else {
-                gridPreview.style.display = 'none';
-                canvas.style.display = 'none';
-                previewImg.style.display = 'block';
-            }
-        } else if (currentPdf) {
-            gridPreview.style.display = 'none';
-            previewImg.style.display = 'none';
-            canvas.style.display = 'block';
-        }
+    let result = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c] !== null) result.push(grid[r][c]);
+      }
     }
+    return result;
+  }
 
-    colorMode.addEventListener('change', updatePreviewDisplay);
-    orientation.addEventListener('change', updatePreviewDisplay);
-    pageSize.addEventListener('change', updatePreviewDisplay);
-    layout.addEventListener('change', updatePreviewDisplay);
-    scaleSelect.addEventListener('change', () => { if (currentPdf) renderPdfPage(pageNum); });
+  return indices;
+}
 
-    document.getElementById('printForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Print job successfully transmitted with all enterprise settings!');
-    });
+function drawPageMock(ctx, pageNum, x, y, w, h) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  if (state.printPageBorder || state.activeSizingMode === 'multiple') {
+    ctx.strokeStyle = '#999999';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(2, 2, w - 4, h - 4);
+  }
+
+  const padding = 12;
+  const contentWidth = w - padding * 2;
+
+  ctx.fillStyle = '#DAE8FC';
+  ctx.fillRect(x + padding, y + padding, contentWidth, 30);
+  ctx.fillStyle = '#6C8EBF';
+  ctx.fillRect(x + padding + 5, y + padding + 5, 20, 20);
+
+  let lineY = y + padding + 40;
+  while (lineY < y + h - padding - 20) {
+    ctx.fillStyle = '#444444';
+    ctx.fillRect(x + padding, lineY, contentWidth * (0.6 + Math.random() * 0.35), 4);
+    lineY += 10;
+  }
+
+  ctx.fillStyle = '#007acc';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`P. ${pageNum}`, x + w / 2, y + h - 15);
+
+  ctx.restore();
+}
+
+function exportConfiguration() {
+  const exportPayload = {
+    acrobatSettings: {
+      printer: state.printer,
+      pageRangeType: state.pageRangeType,
+      parsedPages: state.parsedPages,
+      sizingMode: state.activeSizingMode,
+      sizeOptions: {
+        mode: state.sizeMode,
+        customScale: state.customScale,
+        chooseSourceByPdf: state.chooseSourceByPdf
+      },
+      multipleOptions: {
+        pagesPerSheet: state.pagesPerSheet,
+        customCols: state.customNupCols,
+        customRows: state.customNupRows,
+        pageOrder: state.pageOrder,
+        printBorder: state.printPageBorder
+      },
+      bookletOptions: {
+        subset: state.bookletSubset,
+        binding: state.bookletBinding
+      },
+      orientation: state.orientation
+    },
+    canonDriverSettings: { ...state.canon }
+  };
+
+  console.log('Exporting Print Configuration State:', JSON.stringify(exportPayload, null, 2));
+  alert('Print State JSON exported successfully to console log.');
+}
 </script>
-
 </body>
 </html>
