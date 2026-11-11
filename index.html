@@ -1,823 +1,577 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Print Management System</title>
-<style>
-  :root {
-    --bg-primary: #1e1e1e;
-    --bg-secondary: #252526;
-    --bg-tertiary: #2d2d2d;
-    --bg-hover: #3e3e42;
-    --accent: #007acc;
-    --accent-hover: #1c97ea;
-    --text-main: #cccccc;
-    --text-bright: #ffffff;
-    --border: #3e3e42;
-    --paper-bg: #ffffff;
-    --paper-shadow: rgba(0,0,0,0.5);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; }
-  body { background-color: var(--bg-primary); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-
-  header { background-color: var(--bg-tertiary); padding: 8px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 14px; color: var(--text-bright); font-weight: 600; }
-  
-  .main-container { display: flex; flex: 1; overflow: hidden; }
-  
-  /* Left Panel: Settings */
-  .settings-panel { width: 420px; background-color: var(--bg-secondary); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-  
-  .nav-tabs { display: flex; background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border); }
-  .nav-tab { padding: 8px 14px; background: none; border: none; color: var(--text-main); cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
-  .nav-tab.active { color: var(--text-bright); border-bottom-color: var(--accent); background-color: var(--bg-secondary); }
-  
-  .tab-content { flex: 1; overflow-y: auto; padding: 12px; display: none; }
-  .tab-content.active { display: block; }
-
-  .sub-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 12px; padding-bottom: 4px; }
-  .sub-tab { padding: 4px 8px; background: none; border: 1px solid transparent; color: var(--text-main); cursor: pointer; border-radius: 2px; }
-  .sub-tab.active { background-color: var(--bg-hover); color: var(--text-bright); border-color: var(--border); }
-
-  .form-group { margin-bottom: 12px; }
-  .form-group label { display: block; margin-bottom: 4px; color: var(--text-main); }
-  .form-row { display: flex; gap: 8px; align-items: center; }
-  .form-row .form-group { flex: 1; margin-bottom: 0; }
-  
-  input[type="text"], input[type="number"], select { width: 100%; padding: 4px 6px; background-color: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-bright); border-radius: 2px; outline: none; }
-  input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: var(--accent); }
-  
-  .checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-bright); margin-bottom: 6px; }
-  input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
-
-  fieldset { border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; }
-  legend { padding: 0 4px; color: var(--text-bright); font-weight: 600; }
-
-  /* Right Panel: Preview */
-  .preview-panel { flex: 1; display: flex; flex-direction: column; background-color: #121212; position: relative; }
-  .preview-toolbar { padding: 8px 16px; background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .preview-viewport { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: auto; position: relative; }
-  
-  #previewCanvas { background-color: transparent; box-shadow: 0 4px 20px var(--paper-shadow); transition: transform 0.1s ease; }
-  
-  .page-controls { display: flex; align-items: center; gap: 8px; }
-  .btn { padding: 4px 12px; background-color: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-bright); cursor: pointer; border-radius: 2px; }
-  .btn:hover { background-color: var(--bg-hover); }
-  .btn-primary { background-color: var(--accent); border-color: var(--accent); }
-  .btn-primary:hover { background-color: var(--accent-hover); }
-
-  footer { background-color: var(--bg-tertiary); padding: 8px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
-  
-  .disabled { opacity: 0.4; pointer-events: none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070b12">
+  <meta name="description" content="Smart Print Gateway — upload, configure and send print jobs to the shop counter with live preview and pricing.">
+  <title>Smart Print Gateway — Print Portal</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
+<div class="ambient" aria-hidden="true"></div>
 
-<header>
-  <h1>Print Studio - Adobe Acrobat & Canon Driver Settings</h1>
-</header>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Smart Print Gateway home">
+    <span class="brand-mark"><span data-icon="printer" data-icon-size="21"></span></span>
+    <span class="brand-text"><strong>Smart Print</strong><small>Gateway</small></span>
+  </a>
 
-<div class="main-container">
-  <!-- Left Side: Controls -->
-  <div class="settings-panel">
-    <div class="nav-tabs">
-      <button class="nav-tab active" data-tab="acrobat">Adobe Acrobat</button>
-      <button class="nav-tab" data-tab="canon">Canon Properties</button>
-    </div>
-
-    <!-- TAB: ADOBE ACROBAT -->
-    <div id="acrobat" class="tab-content active">
-      <fieldset>
-        <legend>Printer & Range</legend>
-        <div class="form-group">
-          <label for="printerSelect">Printer</label>
-          <select id="printerSelect">
-            <option value="Canon iR-ADV C5550 III">Canon iR-ADV C5550 III</option>
-            <option value="Canon 5760">Canon 5760</option>
-            <option value="Microsoft Print to PDF">Microsoft Print to PDF</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Pages to Print</label>
-          <div class="form-row" style="margin-bottom: 4px;">
-            <label class="checkbox-label"><input type="radio" name="pageRangeType" value="all" checked> All</label>
-            <label class="checkbox-label"><input type="radio" name="pageRangeType" value="current"> Current</label>
-            <label class="checkbox-label"><input type="radio" name="pageRangeType" value="pages"> Pages</label>
-          </div>
-          <input type="text" id="pageRangeInput" value="1-8" disabled placeholder="e.g. 1-5, 8, 11-13">
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Page Sizing & Handling</legend>
-        <div class="sub-tabs">
-          <button class="sub-tab active" data-subtab="size">Size</button>
-          <button class="sub-tab" data-subtab="poster">Poster</button>
-          <button class="sub-tab" data-subtab="multiple">Multiple</button>
-          <button class="sub-tab" data-subtab="booklet">Booklet</button>
-        </div>
-
-        <!-- Mode: Size -->
-        <div id="mode-size" class="mode-content">
-          <label class="checkbox-label"><input type="radio" name="sizeMode" value="fit" checked> Fit</label>
-          <label class="checkbox-label"><input type="radio" name="sizeMode" value="actual"> Actual size</label>
-          <label class="checkbox-label"><input type="radio" name="sizeMode" value="shrink"> Shrink oversized pages</label>
-          <label class="checkbox-label"><input type="radio" name="sizeMode" value="custom"> Custom Scale:</label>
-          <div class="form-row" style="padding-left: 20px; margin-bottom: 8px;">
-            <input type="number" id="customScaleInput" value="100" min="25" max="400" disabled>%
-          </div>
-          <label class="checkbox-label"><input type="checkbox" id="chooseSourceByPdf"> Choose paper source by PDF page size</label>
-        </div>
-
-        <!-- Mode: Poster -->
-        <div id="mode-poster" class="mode-content" style="display:none;">
-          <div class="form-group">
-            <label for="tileScale">Tile Scale (%)</label>
-            <input type="number" id="tileScale" value="100" min="10" max="1000">
-          </div>
-          <div class="form-group">
-            <label for="overlapInput">Overlap (inches)</label>
-            <input type="number" id="overlapInput" value="0.00" step="0.01">
-          </div>
-          <label class="checkbox-label"><input type="checkbox" id="cutMarks"> Cut marks</label>
-          <label class="checkbox-label"><input type="checkbox" id="labels"> Labels</label>
-        </div>
-
-        <!-- Mode: Multiple -->
-        <div id="mode-multiple" class="mode-content" style="display:none;">
-          <div class="form-group">
-            <label for="pagesPerSheet">Pages per sheet</label>
-            <select id="pagesPerSheet">
-              <option value="2">2</option>
-              <option value="4">4</option>
-              <option value="6">6</option>
-              <option value="9">9</option>
-              <option value="16">16</option>
-              <option value="custom">Custom...</option>
-            </select>
-          </div>
-          <div id="customNupRow" class="form-row" style="display:none; margin-bottom: 8px;">
-            <div class="form-group">
-              <label>Pages by</label>
-              <input type="number" id="customNupCols" value="2" min="1" max="8">
-            </div>
-            <div class="form-group">
-              <label>by</label>
-              <input type="number" id="customNupRows" value="2" min="1" max="8">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="pageOrder">Page order</label>
-            <select id="pageOrder">
-              <option value="horizontal">Horizontal</option>
-              <option value="horizontalReversed">Horizontal Reversed</option>
-              <option value="vertical">Vertical</option>
-              <option value="verticalReversed">Vertical Reversed</option>
-            </select>
-          </div>
-          <label class="checkbox-label"><input type="checkbox" id="printPageBorder"> Print page border</label>
-        </div>
-
-        <!-- Mode: Booklet -->
-        <div id="mode-booklet" class="mode-content" style="display:none;">
-          <div class="form-group">
-            <label for="bookletSubset">Booklet subset</label>
-            <select id="bookletSubset">
-              <option value="both">Both sides</option>
-              <option value="front">Front side only</option>
-              <option value="back">Back side only</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="bookletBinding">Binding</label>
-            <select id="bookletBinding">
-              <option value="left">Left</option>
-              <option value="right">Right</option>
-              <option value="leftTall">Left (Tall)</option>
-              <option value="rightTall">Right (Tall)</option>
-            </select>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Orientation</legend>
-        <label class="checkbox-label"><input type="radio" name="orientation" value="auto" checked> Auto-rotate pages within each sheet</label>
-        <label class="checkbox-label"><input type="radio" name="orientation" value="portrait"> Portrait</label>
-        <label class="checkbox-label"><input type="radio" name="orientation" value="landscape"> Landscape</label>
-      </fieldset>
-    </div>
-
-    <!-- TAB: CANON DRIVER -->
-    <div id="canon" class="tab-content">
-      <div class="sub-tabs">
-        <button class="sub-tab active" data-canontab="basic">Basic Settings</button>
-        <button class="sub-tab" data-canontab="finishing">Finishing</button>
-        <button class="sub-tab" data-canontab="paper">Paper Source</button>
-        <button class="sub-tab" data-canontab="quality">Quality</button>
-      </div>
-
-      <!-- Canon: Basic Settings -->
-      <div id="canon-basic" class="canon-tab-content">
-        <div class="form-group">
-          <label for="pageSize">Page Size</label>
-          <select id="pageSize">
-            <option value="A4">A4</option>
-            <option value="A3">A3</option>
-            <option value="A5">A5</option>
-            <option value="Letter">Letter</option>
-            <option value="Legal">Legal</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="outputSize">Output Size</label>
-          <select id="outputSize">
-            <option value="same">Match Page Size</option>
-            <option value="A4">A4</option>
-            <option value="A5">A5</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="copiesInput">Copies (1-9999)</label>
-          <input type="number" id="copiesInput" value="1" min="1" max="9999">
-        </div>
-        <div class="form-group">
-          <label for="canonOrientation">Orientation</label>
-          <select id="canonOrientation">
-            <option value="portrait">Portrait</option>
-            <option value="landscape">Landscape</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="canonPageLayout">Page Layout</label>
-          <select id="canonPageLayout">
-            <option value="1">1 on 1</option>
-            <option value="2">2 on 1</option>
-            <option value="4">4 on 1</option>
-            <option value="6">6 on 1</option>
-            <option value="8">8 on 1</option>
-            <option value="9">9 on 1</option>
-            <option value="16">16 on 1</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="colorMode">Color Mode</label>
-          <select id="colorMode">
-            <option value="color">Auto [Color/B&W]</option>
-            <option value="bw">Black and White</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Canon: Finishing -->
-      <div id="canon-finishing" class="canon-tab-content" style="display:none;">
-        <div class="form-group">
-          <label for="printStyle">Print Style</label>
-          <select id="printStyle">
-            <option value="1sided">1-sided Printing</option>
-            <option value="2sided">2-sided Printing</option>
-            <option value="booklet">Booklet Printing</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="bindingLocation">Binding Location</label>
-          <select id="bindingLocation">
-            <option value="longEdgeLeft">Long Edge [Left]</option>
-            <option value="longEdgeRight">Long Edge [Right]</option>
-            <option value="shortEdgeTop">Short Edge [Top]</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="stapleCollate">Staple / Collate</label>
-          <select id="stapleCollate">
-            <option value="collate">Collate</option>
-            <option value="group">Group</option>
-            <option value="stapleCollate">Staple + Collate</option>
-            <option value="ecoStaple">Eco (Staple-Free) + Collate</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Canon: Paper Source -->
-      <div id="canon-paper" class="canon-tab-content" style="display:none;">
-        <div class="form-group">
-          <label for="paperSelection">Paper Selection</label>
-          <select id="paperSelection">
-            <option value="auto">Auto</option>
-            <option value="drawer1">Drawer 1</option>
-            <option value="drawer2">Drawer 2</option>
-            <option value="multi">Multi-purpose Tray</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="paperType">Paper Type</label>
-          <select id="paperType">
-            <option value="auto">Auto</option>
-            <option value="plain">Plain (64-105 g/m²)</option>
-            <option value="heavy1">Heavy 1 (106-150 g/m²)</option>
-            <option value="heavy2">Heavy 2 (151-220 g/m²)</option>
-            <option value="photo">Photo Paper</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Canon: Quality -->
-      <div id="canon-quality" class="canon-tab-content" style="display:none;">
-        <div class="form-group">
-          <label for="objectiveTarget">Objective</label>
-          <select id="objectiveTarget">
-            <option value="general">General</option>
-            <option value="publications">Publications</option>
-            <option value="graphics">Graphics</option>
-            <option value="vivid">Vivid Photo</option>
-            <option value="cad">Designs [CAD]</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="resolution">Resolution</label>
-          <select id="resolution">
-            <option value="600">600 dpi</option>
-            <option value="1200">1200 dpi</option>
-          </select>
-        </div>
-      </div>
-    </div>
+  <div class="shop-chip" title="Shop status">
+    <span class="dot" id="shopDot"></span>
+    <span id="shopName">Print desk</span>
+    <span class="shop-hours" id="shopHours">Connecting…</span>
   </div>
 
-  <!-- Right Side: Live Canvas Preview -->
-  <div class="preview-panel">
-    <div class="preview-toolbar">
-      <div class="page-controls">
-        <button class="btn" id="prevSheetBtn">&lt;</button>
-        <span id="sheetTracker">Sheet 1 of 1</span>
-        <button class="btn" id="nextSheetBtn">&gt;</button>
-      </div>
+  <div class="topbar-actions">
+    <button class="icon-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme"><span data-theme-icon></span></button>
+    <button class="btn ghost sm" id="historyBtn" title="Your recent jobs"><span data-icon="history" data-icon-size="15"></span><span>History</span></button>
+    <a class="btn ghost sm" href="/dashboard" target="_blank" id="dashboardLink" title="Open operator console"><span data-icon="layoutDashboard" data-icon-size="15"></span><span>Operator</span></a>
+    <div class="connection-pill" id="connectionPill" title="Backend connection"><span class="dot"></span><span id="connectionText">Connecting…</span></div>
+    <button class="btn primary sm" id="helpBtn"><span data-icon="sparkles" data-icon-size="15"></span><span>Print assistant</span></button>
+  </div>
+</header>
+
+<div class="demo-banner" id="offlineBanner" hidden>
+  <span data-icon="alertTriangle" data-icon-size="15"></span>
+  <span><strong>Preview mode</strong> — the print desk server is offline. You can explore every setting, but sending a job needs the shop server running.</span>
+  <button class="btn sm ghost" id="retryBtn">Retry connection</button>
+</div>
+
+<main class="workspace">
+  <!-- ============================ SETTINGS ============================ -->
+  <aside class="settings-panel panel" aria-label="Print settings">
+    <div class="panel-head">
       <div>
-        <label class="checkbox-label" style="display:inline-flex;">
-          <input type="checkbox" id="fitToFrameCheck"> Fit picture to frame
-        </label>
+        <h2>Print setup</h2>
+        <p id="settingsSubtitle">Add a document to begin</p>
+      </div>
+      <button class="icon-btn sm" id="resetBtn" title="Reset all settings" aria-label="Reset settings"><span data-icon="refresh" data-icon-size="15"></span></button>
+    </div>
+
+    <div class="panel-scroll">
+      <section class="doc-section">
+        <div class="section-head">
+          <h3>Documents <span class="count-badge" id="docCount">0</span></h3>
+          <button class="text-btn" id="sampleBtn">Load sample</button>
+        </div>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload documents">
+          <input type="file" id="fileInput" multiple hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.bmp,.tif,.tiff,application/pdf,image/*">
+          <div class="dropzone-icon"><span data-icon="upload" data-icon-size="20"></span></div>
+          <div>
+            <strong>Drop files here</strong>
+            <span>or <u>browse</u> from this device</span>
+          </div>
+          <div class="file-types"><span>PDF</span><span>DOCX</span><span>XLSX</span><span>IMG</span></div>
+        </div>
+
+        <div class="doc-list" id="docList"></div>
+        <button class="doc-add" id="addDocBtn" hidden><span data-icon="plus" data-icon-size="14"></span> Add another document</button>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="Settings sections">
+        <button class="tab active" data-tab="layout" role="tab" aria-selected="true">Layout</button>
+        <button class="tab" data-tab="printer" role="tab" aria-selected="false">Printer</button>
+        <button class="tab" data-tab="presets" role="tab" aria-selected="false">Presets</button>
+      </div>
+
+      <!-- LAYOUT TAB -->
+      <div class="tab-panel active" id="tab-layout" role="tabpanel">
+        <div class="card">
+          <div class="card-head"><h3>Printer &amp; pages</h3><span class="badge" id="printerBadge">Colour</span></div>
+          <label class="field">
+            <span>Target printer</span>
+            <select id="printerSelect"></select>
+          </label>
+          <div class="field">
+            <span>Pages to print</span>
+            <div class="segmented" id="rangeType" role="group" aria-label="Page range type">
+              <button data-value="all" class="active">All</button>
+              <button data-value="current">Current</button>
+              <button data-value="custom">Range</button>
+            </div>
+            <input type="text" id="pageRange" placeholder="e.g. 1-5, 8, 11-13" disabled autocomplete="off" spellcheck="false">
+            <div class="field-hint" id="pageRangeHint">Add a document to see its pages</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Page sizing &amp; handling</h3></div>
+          <div class="mode-switch" id="sizingMode" role="group" aria-label="Sizing mode">
+            <button data-value="size" class="active">Size</button>
+            <button data-value="poster">Poster</button>
+            <button data-value="multiple">Multiple</button>
+            <button data-value="booklet">Booklet</button>
+          </div>
+
+          <div class="mode-panel" data-mode="size">
+            <label class="radio-card"><input type="radio" name="sizeMode" value="fit" checked><span><strong>Fit</strong><small>Scale each page to fit the selected paper</small></span></label>
+            <label class="radio-card"><input type="radio" name="sizeMode" value="actual"><span><strong>Actual size</strong><small>Print at 100% of the original page size</small></span></label>
+            <label class="radio-card"><input type="radio" name="sizeMode" value="shrink"><span><strong>Shrink oversized pages</strong><small>Reduce only pages larger than the paper</small></span></label>
+            <label class="radio-card"><input type="radio" name="sizeMode" value="custom"><span><strong>Custom scale</strong><small>Enter a percentage from 25% to 400%</small></span></label>
+            <div class="inline-field" style="padding-left: 28px; margin: -2px 0 8px;">
+              <input type="number" id="customScale" value="100" min="25" max="400" step="1" disabled aria-label="Custom scale percentage"><span>% of original size</span>
+            </div>
+            <label class="switch-row"><input type="checkbox" id="chooseSourceByPdf"><span>Choose paper source by PDF page size</span></label>
+          </div>
+
+          <div class="mode-panel" data-mode="poster" hidden>
+            <div class="grid-2">
+              <label class="field"><span>Tile scale (%)</span><input type="number" id="tileScale" value="100" min="10" max="400" step="5"></label>
+              <label class="field"><span>Overlap (inches)</span><input type="number" id="posterOverlap" value="0" min="0" max="2" step="0.05"></label>
+            </div>
+            <label class="switch-row"><input type="checkbox" id="cutMarks" checked><span>Print cut marks</span></label>
+            <label class="switch-row"><input type="checkbox" id="posterLabels"><span>Print tile labels</span></label>
+            <div class="mode-note"><span data-icon="info" data-icon-size="14"></span><span>One page is split across multiple sheets. Overlap helps align tiles when assembling the poster.</span></div>
+          </div>
+
+          <div class="mode-panel" data-mode="multiple" hidden>
+            <div class="grid-2">
+              <label class="field"><span>Pages per sheet</span>
+                <select id="pagesPerSheet">
+                  <option value="2">2-up</option>
+                  <option value="4" selected>4-up</option>
+                  <option value="6">6-up</option>
+                  <option value="8">8-up</option>
+                  <option value="9">9-up</option>
+                  <option value="12">12-up</option>
+                  <option value="16">16-up</option>
+                  <option value="custom">Custom…</option>
+                </select>
+              </label>
+              <label class="field"><span>Page order</span>
+                <select id="pageOrder">
+                  <option value="horizontal">Horizontal</option>
+                  <option value="horizontalReversed">Horizontal reversed</option>
+                  <option value="vertical">Vertical</option>
+                  <option value="verticalReversed">Vertical reversed</option>
+                </select>
+              </label>
+            </div>
+            <div class="grid-2" id="customNup" hidden>
+              <label class="field"><span>Columns</span><input type="number" id="customNupCols" value="2" min="1" max="8"></label>
+              <label class="field"><span>Rows</span><input type="number" id="customNupRows" value="2" min="1" max="8"></label>
+            </div>
+            <div class="grid-2">
+              <label class="field"><span>Gutter (mm)</span><input type="number" id="nupGutter" value="0" min="0" max="30"></label>
+              <label class="switch-row" style="align-self:end;padding-bottom:9px;"><input type="checkbox" id="nupBorder" checked><span>Page border</span></label>
+            </div>
+            <div class="mode-note"><span data-icon="grid" data-icon-size="14"></span><span>Great for handouts, revision sheets and reducing paper use. Maximum 16 pages per side.</span></div>
+          </div>
+
+          <div class="mode-panel" data-mode="booklet" hidden>
+            <div class="grid-2">
+              <label class="field"><span>Booklet subset</span>
+                <select id="bookletSubset">
+                  <option value="both">Both sides</option>
+                  <option value="front">Front side only</option>
+                  <option value="back">Back side only</option>
+                </select>
+              </label>
+              <label class="field"><span>Binding</span>
+                <select id="bookletBinding">
+                  <option value="left">Left binding</option>
+                  <option value="right">Right binding</option>
+                  <option value="leftTall">Left binding (tall)</option>
+                  <option value="rightTall">Right binding (tall)</option>
+                </select>
+              </label>
+            </div>
+            <label class="field"><span>Centre gutter (mm)</span><input type="number" id="bookletGutter" value="0" min="0" max="50"></label>
+            <label class="switch-row"><input type="checkbox" id="bookletFold" checked><span>Add fold / crease line in preview</span></label>
+            <div class="mode-note"><span data-icon="book" data-icon-size="14"></span><span>Pages are imposed in saddle-stitch order. Page count is rounded up to a multiple of four with blank pages.</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Orientation &amp; rotation</h3></div>
+          <div class="segmented" id="orientation" role="group" aria-label="Orientation">
+            <button data-value="auto" class="active">Auto-rotate</button>
+            <button data-value="portrait">Portrait</button>
+            <button data-value="landscape">Landscape</button>
+          </div>
+          <div class="field-hint mt-8" id="orientationHint">Auto-rotate turns pages to best fit each sheet.</div>
+        </div>
+      </div>
+
+      <!-- PRINTER TAB -->
+      <div class="tab-panel" id="tab-printer" role="tabpanel">
+        <div class="card">
+          <div class="card-head"><h3>Basic settings</h3><span class="badge accent">Canon driver</span></div>
+          <div class="grid-2">
+            <label class="field"><span>Page size</span>
+              <select id="pageSize">
+                <option value="A4" selected>A4 — 210 × 297 mm</option>
+                <option value="A3">A3 — 297 × 420 mm</option>
+                <option value="A5">A5 — 148 × 210 mm</option>
+                <option value="Letter">Letter — 8.5 × 11 in</option>
+                <option value="Legal">Legal — 8.5 × 14 in</option>
+              </select>
+            </label>
+            <label class="field"><span>Output size</span>
+              <select id="outputSize">
+                <option value="same">Match page size</option>
+                <option value="A4">A4</option>
+                <option value="A3">A3</option>
+                <option value="A5">A5</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid-2">
+            <label class="field"><span>Copies (1–9999)</span><input type="number" id="copies" value="1" min="1" max="9999"></label>
+            <label class="field"><span>Resolution</span>
+              <select id="resolution">
+                <option value="600" selected>600 dpi</option>
+                <option value="1200">1200 dpi</option>
+              </select>
+            </label>
+          </div>
+          <label class="field"><span>Colour mode</span>
+            <select id="colorMode">
+              <option value="auto" selected>Auto colour / B&amp;W</option>
+              <option value="grayscale">Black &amp; white (grayscale)</option>
+              <option value="mono">Pure black &amp; white (high contrast)</option>
+            </select>
+          </label>
+          <div class="mode-note" id="colorHint"><span data-icon="palette" data-icon-size="14"></span><span>Colour pages are detected automatically for accurate pricing.</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Finishing &amp; duplex</h3></div>
+          <label class="field"><span>Print style</span>
+            <select id="printStyle">
+              <option value="1sided" selected>1-sided printing</option>
+              <option value="2sided">2-sided printing (duplex)</option>
+              <option value="booklet">Booklet printing</option>
+            </select>
+          </label>
+          <label class="field"><span>Binding location</span>
+            <select id="bindingLocation">
+              <option value="longEdgeLeft" selected>Long edge — left</option>
+              <option value="longEdgeRight">Long edge — right</option>
+              <option value="shortEdgeTop">Short edge — top</option>
+              <option value="shortEdgeBottom">Short edge — bottom</option>
+            </select>
+          </label>
+          <label class="field"><span>Staple &amp; collate</span>
+            <select id="stapleCollate">
+              <option value="collate" selected>Collate</option>
+              <option value="group">Group</option>
+              <option value="stapleCollate">Staple + collate</option>
+              <option value="ecoStaple">Eco staple-free + collate</option>
+            </select>
+          </label>
+          <div class="mode-note"><span data-icon="info" data-icon-size="14"></span><span>Stapling is applied per copy set. The operator confirms finisher settings before printing.</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Paper source &amp; quality</h3></div>
+          <label class="field"><span>Paper source</span>
+            <select id="paperSource">
+              <option value="auto" selected>Auto select</option>
+              <option value="drawer1">Drawer 1</option>
+              <option value="drawer2">Drawer 2</option>
+              <option value="drawer3">Drawer 3</option>
+              <option value="bypass">Multi-purpose tray</option>
+            </select>
+          </label>
+          <label class="field"><span>Paper type</span>
+            <select id="paperType">
+              <option value="plain" selected>Plain (64–105 gsm)</option>
+              <option value="recycled">Recycled</option>
+              <option value="heavy1">Heavy 1 (106–150 gsm)</option>
+              <option value="heavy2">Heavy 2 (151–220 gsm)</option>
+              <option value="photo">Photo paper</option>
+              <option value="transparency">Transparency</option>
+            </select>
+          </label>
+          <label class="field"><span>Objective</span>
+            <select id="objective">
+              <option value="general" selected>General</option>
+              <option value="publications">Publications</option>
+              <option value="graphics">Graphics</option>
+              <option value="vivid">Vivid photo</option>
+              <option value="cad">Designs / CAD</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- PRESETS TAB -->
+      <div class="tab-panel" id="tab-presets" role="tabpanel">
+        <div class="card">
+          <div class="card-head"><h3>Quick presets</h3><span class="badge">1 click</span></div>
+          <div id="presetList" class="doc-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Save current settings</h3></div>
+          <label class="field"><span>Preset name</span><input type="text" id="presetName" placeholder="e.g. School handout 4-up" maxlength="40"></label>
+          <button class="btn soft block" id="savePresetBtn"><span data-icon="plus" data-icon-size="15"></span> Save preset</button>
+          <div class="field-hint mt-8">Presets are stored on this device and can be loaded in one tap.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Reset</h3></div>
+          <button class="btn ghost block" id="resetAllBtn"><span data-icon="refresh" data-icon-size="15"></span> Restore default settings</button>
+        </div>
       </div>
     </div>
-    
-    <div class="preview-viewport">
-      <canvas id="previewCanvas" width="400" height="565"></canvas>
+  </aside>
+
+  <!-- ============================ PREVIEW ============================ -->
+  <section class="preview-panel panel" aria-label="Print preview">
+    <div class="preview-toolbar">
+      <div class="toolbar-group">
+        <button class="icon-btn" id="prevSheet" title="Previous sheet" aria-label="Previous sheet"><span data-icon="chevronLeft" data-icon-size="16"></span></button>
+        <span class="sheet-tracker" id="sheetTracker">Sheet 1 of 1</span>
+        <button class="icon-btn" id="nextSheet" title="Next sheet" aria-label="Next sheet"><span data-icon="chevronRight" data-icon-size="16"></span></button>
+      </div>
+      <div class="toolbar-group">
+        <span class="preview-badge" id="previewBadge">A4 · Portrait</span>
+        <button class="icon-btn" id="zoomOut" title="Zoom out" aria-label="Zoom out"><span data-icon="minus" data-icon-size="15"></span></button>
+        <button class="zoom-label" id="zoomLabel" title="Reset zoom">100%</button>
+        <button class="icon-btn" id="zoomIn" title="Zoom in" aria-label="Zoom in"><span data-icon="plus" data-icon-size="15"></span></button>
+        <button class="icon-btn" id="fitBtn" title="Fit to screen" aria-label="Fit to screen"><span data-icon="maximize" data-icon-size="15"></span></button>
+        <label class="switch-row compact" title="Force page content to fit inside the frame"><input type="checkbox" id="fitToFrame"><span>Fit picture to frame</span></label>
+        <button class="icon-btn" id="fullscreenBtn" title="Full screen preview" aria-label="Full screen preview"><span data-icon="maximize" data-icon-size="15"></span></button>
+      </div>
+    </div>
+
+    <div class="preview-stage" id="previewStage">
+      <div class="preview-empty" id="previewEmpty">
+        <div class="empty-illustration"><span data-icon="fileText" data-icon-size="48"></span></div>
+        <h2>Your print preview appears here</h2>
+        <p>Upload a PDF, Word, Excel or image file. Configure the layout on the left and watch every change render instantly on the sheet.</p>
+        <div class="empty-actions">
+          <button class="btn primary" id="emptyUploadBtn"><span data-icon="upload" data-icon-size="15"></span> Upload a file</button>
+          <button class="btn ghost" id="emptySampleBtn">Try the sample</button>
+        </div>
+        <div class="tour-hint">First time? <button id="emptyTourBtn">Take the 60-second tour →</button></div>
+      </div>
+      <div class="paper-wrap" id="paperWrap" hidden>
+        <canvas id="previewCanvas" width="800" height="1131" aria-label="Print sheet preview"></canvas>
+        <div class="paper-corner" id="paperCorner">A4 · Sheet 1</div>
+      </div>
+      <div class="preview-loading" id="previewLoading" hidden><span class="spinner"></span><span>Rendering preview…</span></div>
+    </div>
+
+    <div class="filmstrip-wrap">
+      <div class="filmstrip-head"><span>Sheets</span><span id="sheetCountLabel">0 sheets</span></div>
+      <div class="filmstrip" id="filmstrip"></div>
+    </div>
+  </section>
+
+  <!-- ============================ SUMMARY ============================ -->
+  <aside class="summary-panel panel" aria-label="Job summary">
+    <div class="panel-head">
+      <h2>Job summary</h2>
+      <span class="badge" id="summaryBadge">Draft</span>
+    </div>
+    <div class="summary-scroll">
+      <div class="summary-hero">
+        <span class="summary-label">Estimated total</span>
+        <div class="summary-total" id="summaryTotal">0.000 OMR</div>
+        <span class="summary-sub" id="summarySub">Upload a document to begin</span>
+      </div>
+
+      <div class="stat-grid">
+        <div><span>Pages</span><strong id="statPages">0</strong></div>
+        <div><span>Sides</span><strong id="statSides">0</strong></div>
+        <div><span>Sheets</span><strong id="statSheets">0</strong></div>
+        <div><span>Est. time</span><strong id="statTime">—</strong></div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-card-head"><h3>Price breakdown</h3><button class="icon-btn" id="priceToggle" aria-label="Toggle price breakdown"><span data-icon="chevronUp" data-icon-size="14"></span></button></div>
+        <div id="priceLines" class="price-lines"></div>
+        <div class="price-footer">
+          <div><span>Subtotal</span><span id="priceSubtotal">0.000</span></div>
+          <div><span>VAT <span id="vatRate">5%</span></span><span id="priceVat">0.000</span></div>
+          <div class="total"><span>Total</span><span id="priceTotal">0.000 OMR</span></div>
+        </div>
+      </div>
+
+      <div class="summary-card" id="servicesCard">
+        <div class="summary-card-head"><h3>Add-on services</h3><span class="badge">Optional</span></div>
+        <div class="extras-grid">
+          <label class="switch-row"><input type="checkbox" id="extraLamination"><span>Lamination</span></label>
+          <label class="switch-row"><input type="checkbox" id="extraCutting"><span>Cutting</span></label>
+          <label class="switch-row"><input type="checkbox" id="extraFolding"><span>Folding</span></label>
+          <label class="switch-row"><input type="checkbox" id="extraRush"><span>Rush service</span></label>
+        </div>
+      </div>
+
+      <div class="summary-card warnings-card">
+        <div class="summary-card-head"><h3>Smart checks</h3><span class="badge" id="warningCount">0</span></div>
+        <div class="warnings-list" id="warningsList">
+          <div class="warning-item info"><span data-icon="info" data-icon-size="13"></span><span>Add a document to run automatic checks.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-actions">
+      <button class="btn primary block lg" id="sendBtn" disabled><span data-icon="send" data-icon-size="17"></span> Send to print desk</button>
+      <button class="btn ghost block sm" id="exportBtn"><span data-icon="download" data-icon-size="14"></span> Export job JSON</button>
+      <p class="fineprint">Your files go only to this shop's local print desk. Nothing is uploaded to the cloud.</p>
+    </div>
+  </aside>
+</main>
+
+<div class="mobile-sendbar" id="mobileSendBar">
+  <div><div class="ms-label">Estimated total</div><div class="ms-total" id="msTotal">0.000 OMR</div></div>
+  <button class="btn primary" id="msReviewBtn"><span data-icon="send" data-icon-size="15"></span> Review &amp; send</button>
+</div>
+
+<!-- ============================ SEND MODAL ============================ -->
+<div class="modal-backdrop" id="sendModal" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="sendTitle">
+    <div class="modal-head">
+      <div><h2 id="sendTitle">Review &amp; send to print desk</h2><p>Check the job, add your name, then send it for approval.</p></div>
+      <button class="modal-close" data-close="sendModal" aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="modal-body">
+      <div class="send-summary">
+        <div class="send-preview">
+          <canvas id="sendPreviewCanvas" width="300" height="424"></canvas>
+          <span class="caption" id="sendPreviewCaption">Sheet 1 preview</span>
+        </div>
+        <div class="send-details">
+          <div class="send-line"><span>Documents</span><span id="sendDocLine">—</span></div>
+          <div class="send-line"><span>Pages / sides</span><span id="sendPagesLine">—</span></div>
+          <div class="send-line"><span>Paper</span><span id="sendPaperLine">—</span></div>
+          <div class="send-line"><span>Layout</span><span id="sendLayoutLine">—</span></div>
+          <div class="send-line"><span>Finishing</span><span id="sendFinishLine">—</span></div>
+          <div class="send-line"><span>Colour</span><span id="sendColorLine">—</span></div>
+          <div class="send-line"><span>Copies</span><span id="sendCopiesLine">—</span></div>
+          <div class="send-line"><span>Estimated time</span><span id="sendTimeLine">—</span></div>
+          <div class="send-total"><span>Total incl. VAT</span><strong id="sendTotal">0.000 OMR</strong></div>
+        </div>
+      </div>
+
+      <div class="form-section-title">Contact details</div>
+      <div class="grid-2">
+        <label class="field"><span>Your name *</span><input type="text" id="customerName" placeholder="Name for the counter" maxlength="80" autocomplete="name"></label>
+        <label class="field"><span>Phone (optional)</span><input type="tel" id="customerPhone" placeholder="+968 …" maxlength="30" autocomplete="tel"></label>
+      </div>
+      <label class="field"><span>Note for the print team (optional)</span><textarea id="customerNote" placeholder="e.g. Please staple top-left, or call me when ready." maxlength="600"></textarea></label>
+
+      <div class="form-section-title">Print-ready preparation</div>
+      <label class="switch-row" style="margin-bottom:8px"><input type="checkbox" id="exactImposition" checked><span><strong style="color:var(--text)">Pre-impose exact sheets</strong> — render the layout you see into a print-ready PDF</span></label>
+      <div class="grid-2">
+        <label class="field"><span>Render quality</span>
+          <select id="impositionQuality">
+            <option value="120">Draft — 120 dpi (fast)</option>
+            <option value="150" selected>Standard — 150 dpi</option>
+            <option value="200">High — 200 dpi</option>
+            <option value="300">Maximum — 300 dpi (slow)</option>
+          </select>
+        </label>
+        <div class="field"><span>What this does</span><div class="field-hint" id="impositionNote">N-up, booklet, scaling and colour conversion are baked into the file so the printer matches the preview exactly.</div></div>
+      </div>
+
+      <div class="upload-status" id="sendProgressWrap" hidden>
+        <div class="row"><strong id="sendProgressText">Preparing your job…</strong><span id="sendProgressPct">0%</span></div>
+        <div class="progress-bar"><i id="sendProgressBar"></i></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close="sendModal">Back</button>
+      <div class="right">
+        <div style="text-align:right;margin-right:6px"><div class="ms-label">Total incl. VAT</div><strong id="sendTotalFoot" style="font-size:15px">0.000 OMR</strong></div>
+        <button class="btn primary" id="confirmSendBtn"><span data-icon="send" data-icon-size="16"></span> Send job</button>
+      </div>
     </div>
   </div>
 </div>
 
-<footer>
-  <button class="btn" id="exportBtn">Export Config to JSON</button>
-  <button class="btn btn-primary" id="printBtn">Send to Python Backend</button>
-</footer>
+<!-- ============================ TRACKER MODAL ============================ -->
+<div class="modal-backdrop" id="trackerModal" hidden>
+  <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="trackerTitle">
+    <div class="modal-head">
+      <div><h2 id="trackerTitle">Job status</h2><p id="trackerSubtitle">Live updates from the print desk</p></div>
+      <button class="modal-close" data-close="trackerModal" aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="modal-body" id="trackerBody"></div>
+  </div>
+</div>
 
-<script>
-/**
- * Application State Architecture
- */
-const state = {
-  activeSizingMode: 'size', // 'size' | 'poster' | 'multiple' | 'booklet'
-  
-  printer: 'Canon iR-ADV C5550 III',
-  pageRangeType: 'all',
-  pageRangeInput: '1-8',
-  sizeMode: 'fit', // 'fit', 'actual', 'shrink', 'custom'
-  customScale: 100,
-  chooseSourceByPdf: false,
-  
-  tileScale: 100,
-  overlap: 0.00,
-  cutMarks: false,
-  labels: false,
-  
-  pagesPerSheet: '2',
-  customNupCols: 2,
-  customNupRows: 2,
-  pageOrder: 'horizontal',
-  printPageBorder: false,
-  
-  bookletSubset: 'both',
-  bookletBinding: 'left',
+<!-- ============================ PASSWORD MODAL ============================ -->
+<div class="modal-backdrop" id="passwordModal" hidden>
+  <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="passwordTitle">
+    <div class="modal-head">
+      <div><h2 id="passwordTitle">Protected PDF</h2><p>This document needs a password before it can be previewed.</p></div>
+      <button class="modal-close" data-close="passwordModal" aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="modal-body">
+      <label class="field"><span>PDF password</span><input type="password" id="pdfPassword" placeholder="Enter password" autocomplete="off"></label>
+      <div class="field-hint error" id="pdfPasswordError" hidden>Incorrect password. Try again.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close="passwordModal">Skip file</button>
+      <div class="right"><button class="btn primary" id="pdfPasswordBtn">Unlock PDF</button></div>
+    </div>
+  </div>
+</div>
 
-  orientation: 'auto', // 'auto', 'portrait', 'landscape'
+<!-- ============================ HISTORY DRAWER ============================ -->
+<div class="drawer-backdrop" id="historyDrawer" hidden>
+  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <div class="drawer-head">
+      <div><h2 id="historyTitle">Your recent jobs</h2><p class="small faint">Stored on this device only</p></div>
+      <button class="modal-close" data-close="historyDrawer" aria-label="Close"><span data-icon="close"></span></button>
+    </div>
+    <div class="drawer-body" id="historyList"></div>
+    <div class="drawer-foot"><button class="btn ghost block" id="clearHistoryBtn"><span data-icon="trash" data-icon-size="14"></span> Clear history</button></div>
+  </div>
+</div>
 
-  canon: {
-    pageSize: 'A4',
-    outputSize: 'same',
-    copies: 1,
-    orientation: 'portrait',
-    pageLayout: '1',
-    colorMode: 'color',
-    printStyle: '1sided', // '1sided', '2sided', 'booklet'
-    bindingLocation: 'longEdgeLeft',
-    stapleCollate: 'collate',
-    paperSelection: 'auto',
-    paperType: 'auto',
-    objective: 'general',
-    resolution: '600'
-  },
-  
-  parsedPages: [1, 2, 3, 4, 5, 6, 7, 8],
-  currentSheetIndex: 0,
-  totalSheets: 1,
-  fitToFrame: false
-};
+<!-- ============================ CHATBOT ============================ -->
+<button class="chat-fab" id="chatFab" title="Print assistant" aria-label="Open print assistant">
+  <span data-icon="sparkles" data-icon-size="24"></span>
+  <span class="chat-ping"></span>
+</button>
+<div class="chat-panel" id="chatPanel" hidden>
+  <div class="chat-head">
+    <div class="chat-avatar"><span data-icon="bot" data-icon-size="18"></span></div>
+    <div><strong>Print Assistant</strong><small><span class="online-dot"></span>Online · knows this shop's settings</small></div>
+    <button class="icon-btn sm" id="chatClose" aria-label="Close assistant"><span data-icon="close" data-icon-size="15"></span></button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-quick" id="chatQuick"></div>
+  <form class="chat-input-row" id="chatForm">
+    <input type="text" id="chatInput" placeholder="Ask about layout, pricing, files…" maxlength="500" autocomplete="off">
+    <button type="submit" id="chatSend" aria-label="Send message"><span data-icon="send" data-icon-size="16"></span></button>
+  </form>
+</div>
 
-/**
- * UI Event Listeners & Binding
- */
-document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
-  bindInputs();
-  evaluateStateDependencies();
-  renderPreview();
-});
+<!-- ============================ TOUR ============================ -->
+<div class="tour-overlay" id="tourOverlay" hidden>
+  <div class="tour-spot" id="tourSpot"></div>
+  <div class="tour-tip" id="tourTip">
+    <div class="tour-step" id="tourStep">Step 1 of 6</div>
+    <h3 id="tourTitle">Welcome</h3>
+    <p id="tourText"></p>
+    <div class="tour-actions">
+      <div class="tour-dots" id="tourDots"></div>
+      <button class="btn ghost sm" id="tourSkip">Skip</button>
+      <button class="btn primary sm" id="tourNext">Next</button>
+    </div>
+  </div>
+</div>
 
-function initTabs() {
-  document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      e.target.classList.add('active');
-      document.getElementById(e.target.dataset.tab).classList.add('active');
-    });
-  });
+<div class="toast-stack" id="toasts"></div>
 
-  document.querySelectorAll('[data-subtab]').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      document.querySelectorAll('[data-subtab]').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
-      
-      const mode = e.target.dataset.subtab;
-      state.activeSizingMode = mode;
-      
-      document.querySelectorAll('.mode-content').forEach(el => el.style.display = 'none');
-      document.getElementById(`mode-${mode}`).style.display = 'block';
-      
-      evaluateStateDependencies();
-      renderPreview();
-    });
-  });
-
-  document.querySelectorAll('[data-canontab]').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      document.querySelectorAll('[data-canontab]').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
-      
-      const tabKey = e.target.dataset.canontab;
-      document.querySelectorAll('.canon-tab-content').forEach(el => el.style.display = 'none');
-      document.getElementById(`canon-${tabKey}`).style.display = 'block';
-    });
-  });
-}
-
-function bindInputs() {
-  document.getElementById('printerSelect').addEventListener('change', (e) => {
-    state.printer = e.target.value;
-  });
-
-  document.querySelectorAll('input[name="pageRangeType"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      state.pageRangeType = e.target.value;
-      const input = document.getElementById('pageRangeInput');
-      input.disabled = state.pageRangeType !== 'pages';
-      parsePageRange();
-      evaluateStateDependencies();
-      renderPreview();
-    });
-  });
-
-  document.getElementById('pageRangeInput').addEventListener('input', (e) => {
-    state.pageRangeInput = e.target.value;
-    parsePageRange();
-    evaluateStateDependencies();
-    renderPreview();
-  });
-
-  document.querySelectorAll('input[name="sizeMode"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      state.sizeMode = e.target.value;
-      document.getElementById('customScaleInput').disabled = state.sizeMode !== 'custom';
-      renderPreview();
-    });
-  });
-
-  document.getElementById('customScaleInput').addEventListener('input', (e) => {
-    state.customScale = parseFloat(e.target.value) || 100;
-    renderPreview();
-  });
-
-  document.getElementById('pagesPerSheet').addEventListener('change', (e) => {
-    state.pagesPerSheet = e.target.value;
-    document.getElementById('customNupRow').style.display = state.pagesPerSheet === 'custom' ? 'flex' : 'none';
-    evaluateStateDependencies();
-    renderPreview();
-  });
-
-  document.getElementById('customNupCols').addEventListener('input', (e) => {
-    state.customNupCols = parseInt(e.target.value) || 1;
-    evaluateStateDependencies();
-    renderPreview();
-  });
-
-  document.getElementById('customNupRows').addEventListener('input', (e) => {
-    state.customNupRows = parseInt(e.target.value) || 1;
-    evaluateStateDependencies();
-    renderPreview();
-  });
-
-  document.getElementById('pageOrder').addEventListener('change', (e) => {
-    state.pageOrder = e.target.value;
-    renderPreview();
-  });
-
-  document.getElementById('printPageBorder').addEventListener('change', (e) => {
-    state.printPageBorder = e.target.checked;
-    renderPreview();
-  });
-
-  document.querySelectorAll('input[name="orientation"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      state.orientation = e.target.value;
-      renderPreview();
-    });
-  });
-
-  document.getElementById('printStyle').addEventListener('change', (e) => {
-    state.canon.printStyle = e.target.value;
-    if (state.canon.printStyle === 'booklet') {
-      switchAcrobatMode('booklet');
-    }
-    evaluateStateDependencies();
-    renderPreview();
-  });
-
-  document.getElementById('canonPageLayout').addEventListener('change', (e) => {
-    state.canon.pageLayout = e.target.value;
-    if (state.canon.pageLayout !== '1') {
-      switchAcrobatMode('multiple');
-      document.getElementById('pagesPerSheet').value = state.canon.pageLayout;
-      state.pagesPerSheet = state.canon.pageLayout;
-    }
-    evaluateStateDependencies();
-    renderPreview();
-  });
-
-  document.getElementById('colorMode').addEventListener('change', (e) => {
-    state.canon.colorMode = e.target.value;
-    renderPreview();
-  });
-
-  document.getElementById('prevSheetBtn').addEventListener('click', () => {
-    if (state.currentSheetIndex > 0) {
-      state.currentSheetIndex--;
-      renderPreview();
-    }
-  });
-
-  document.getElementById('nextSheetBtn').addEventListener('click', () => {
-    if (state.currentSheetIndex < state.totalSheets - 1) {
-      state.currentSheetIndex++;
-      renderPreview();
-    }
-  });
-
-  document.getElementById('fitToFrameCheck').addEventListener('change', (e) => {
-    state.fitToFrame = e.target.checked;
-    renderPreview();
-  });
-
-  document.getElementById('exportBtn').addEventListener('click', exportConfiguration);
-  document.getElementById('printBtn').addEventListener('click', exportConfiguration);
-}
-
-function switchAcrobatMode(mode) {
-  state.activeSizingMode = mode;
-  document.querySelectorAll('[data-subtab]').forEach(t => {
-    t.classList.toggle('active', t.dataset.subtab === mode);
-  });
-  document.querySelectorAll('.mode-content').forEach(el => el.style.display = 'none');
-  document.getElementById(`mode-${mode}`).style.display = 'block';
-}
-
-function evaluateStateDependencies() {
-  if (state.activeSizingMode === 'booklet') {
-    state.canon.printStyle = 'booklet';
-    document.getElementById('printStyle').value = 'booklet';
-  }
-
-  let cols = 1, rows = 1;
-  if (state.activeSizingMode === 'multiple') {
-    if (state.pagesPerSheet === 'custom') {
-      cols = state.customNupCols;
-      rows = state.customNupRows;
-    } else {
-      const n = parseInt(state.pagesPerSheet);
-      if (n === 2) { cols = 2; rows = 1; }
-      else if (n === 4) { cols = 2; rows = 2; }
-      else if (n === 6) { cols = 3; rows = 2; }
-      else if (n === 9) { cols = 3; rows = 3; }
-      else if (n === 16) { cols = 4; rows = 4; }
-    }
-  } else if (state.activeSizingMode === 'booklet') {
-    cols = 2; rows = 1;
-  }
-
-  const pagesPerSheetCount = cols * rows;
-  state.totalSheets = Math.ceil(state.parsedPages.length / pagesPerSheetCount) || 1;
-  
-  if (state.currentSheetIndex >= state.totalSheets) {
-    state.currentSheetIndex = state.totalSheets - 1;
-  }
-  if (state.currentSheetIndex < 0) state.currentSheetIndex = 0;
-
-  document.getElementById('sheetTracker').innerText = `Sheet ${state.currentSheetIndex + 1} of ${state.totalSheets}`;
-}
-
-function parsePageRange() {
-  if (state.pageRangeType === 'all') {
-    state.parsedPages = [1, 2, 3, 4, 5, 6, 7, 8];
-  } else if (state.pageRangeType === 'current') {
-    state.parsedPages = [1];
-  } else {
-    const list = [];
-    const parts = state.pageRangeInput.split(',');
-    for (let part of parts) {
-      if (part.includes('-')) {
-        const [start, end] = part.split('-').map(n => parseInt(n.trim()));
-        if (!isNaN(start) && !isNaN(end)) {
-          for (let i = start; i <= end; i++) list.push(i);
-        }
-      } else {
-        const val = parseInt(part.trim());
-        if (!isNaN(val)) list.push(val);
-      }
-    }
-    state.parsedPages = list.length > 0 ? list : [1];
-  }
-}
-
-function renderPreview() {
-  const canvas = document.getElementById('previewCanvas');
-  const ctx = canvas.getContext('2d');
-
-  let isLandscape = state.orientation === 'landscape';
-  if (state.orientation === 'auto' && state.activeSizingMode === 'multiple') {
-    if (state.pagesPerSheet === '2') isLandscape = true;
-  }
-
-  const baseWidth = 400;
-  const baseHeight = 565;
-
-  canvas.width = isLandscape ? baseHeight : baseWidth;
-  canvas.height = isLandscape ? baseWidth : baseHeight;
-
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  if (state.canon.colorMode === 'bw') {
-    ctx.filter = 'grayscale(100%)';
-  } else {
-    ctx.filter = 'none';
-  }
-
-  let cols = 1, rows = 1;
-  if (state.activeSizingMode === 'multiple') {
-    if (state.pagesPerSheet === 'custom') {
-      cols = state.customNupCols;
-      rows = state.customNupRows;
-    } else {
-      const n = parseInt(state.pagesPerSheet);
-      if (n === 2) { cols = 2; rows = 1; }
-      else if (n === 4) { cols = 2; rows = 2; }
-      else if (n === 6) { cols = 3; rows = 2; }
-      else if (n === 9) { cols = 3; rows = 3; }
-      else if (n === 16) { cols = 4; rows = 4; }
-    }
-  } else if (state.activeSizingMode === 'booklet') {
-    cols = 2;
-    rows = 1;
-  }
-
-  const cellWidth = canvas.width / cols;
-  const cellHeight = canvas.height / rows;
-  const pps = cols * rows;
-
-  const startIndex = state.currentSheetIndex * pps;
-  const pageIndices = getMappedPageIndices(startIndex, pps, cols, rows);
-
-  for (let i = 0; i < pageIndices.length; i++) {
-    const pageNum = state.parsedPages[pageIndices[i]];
-    if (pageNum === undefined) continue;
-
-    const row = Math.floor(i / cols);
-    const col = i % cols;
-    const x = col * cellWidth;
-    const y = row * cellHeight;
-
-    drawPageMock(ctx, pageNum, x, y, cellWidth, cellHeight);
-  }
-}
-
-function getMappedPageIndices(startIndex, count, cols, rows) {
-  let indices = [];
-  for (let i = 0; i < count; i++) indices.push(startIndex + i);
-
-  if (state.activeSizingMode === 'multiple') {
-    const grid = [];
-    for (let r = 0; r < rows; r++) {
-      grid[r] = [];
-      for (let c = 0; c < cols; c++) grid[r][c] = null;
-    }
-
-    let p = 0;
-    if (state.pageOrder === 'horizontal') {
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) grid[r][c] = indices[p++];
-      }
-    } else if (state.pageOrder === 'vertical') {
-      for (let c = 0; c < cols; c++) {
-        for (let r = 0; r < rows; r++) grid[r][c] = indices[p++];
-      }
-    }
-
-    let result = [];
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (grid[r][c] !== null) result.push(grid[r][c]);
-      }
-    }
-    return result;
-  }
-
-  return indices;
-}
-
-function drawPageMock(ctx, pageNum, x, y, w, h) {
-  ctx.save();
-  ctx.translate(x, y);
-
-  if (state.printPageBorder || state.activeSizingMode === 'multiple') {
-    ctx.strokeStyle = '#999999';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(2, 2, w - 4, h - 4);
-  }
-
-  const padding = 12;
-  const contentWidth = w - padding * 2;
-
-  ctx.fillStyle = '#DAE8FC';
-  ctx.fillRect(x + padding, y + padding, contentWidth, 30);
-  ctx.fillStyle = '#6C8EBF';
-  ctx.fillRect(x + padding + 5, y + padding + 5, 20, 20);
-
-  let lineY = y + padding + 40;
-  while (lineY < y + h - padding - 20) {
-    ctx.fillStyle = '#444444';
-    ctx.fillRect(x + padding, lineY, contentWidth * (0.6 + Math.random() * 0.35), 4);
-    lineY += 10;
-  }
-
-  ctx.fillStyle = '#007acc';
-  ctx.font = 'bold 16px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(`P. ${pageNum}`, x + w / 2, y + h - 15);
-
-  ctx.restore();
-}
-
-function exportConfiguration() {
-  const exportPayload = {
-    acrobatSettings: {
-      printer: state.printer,
-      pageRangeType: state.pageRangeType,
-      parsedPages: state.parsedPages,
-      sizingMode: state.activeSizingMode,
-      sizeOptions: {
-        mode: state.sizeMode,
-        customScale: state.customScale,
-        chooseSourceByPdf: state.chooseSourceByPdf
-      },
-      multipleOptions: {
-        pagesPerSheet: state.pagesPerSheet,
-        customCols: state.customNupCols,
-        customRows: state.customNupRows,
-        pageOrder: state.pageOrder,
-        printBorder: state.printPageBorder
-      },
-      bookletOptions: {
-        subset: state.bookletSubset,
-        binding: state.bookletBinding
-      },
-      orientation: state.orientation
-    },
-    canonDriverSettings: { ...state.canon }
-  };
-
-  console.log('Exporting Print Configuration State:', JSON.stringify(exportPayload, null, 2));
-  alert('Print State JSON exported successfully to console log.');
-}
-</script>
+<script src="/shared/pricing.js"></script>
+<script src="/shared/pdf-builder.js"></script>
+<script src="/shared/sample-pdf.js"></script>
+<script src="/assets/vendor/pdf.min.js"></script>
+<script src="/assets/js/icons.js"></script>
+<script src="/assets/js/ui.js"></script>
+<script src="/assets/js/documents.js"></script>
+<script src="/assets/js/preview.js"></script>
+<script src="/assets/js/chatbot.js"></script>
+<script src="/assets/js/app.js"></script>
 </body>
 </html>
