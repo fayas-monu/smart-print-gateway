@@ -1,10 +1,10 @@
 /*
- * Smart Print Gateway — shared pricing engine
- * Used by both the browser client and the Node.js backend so that the
- * customer estimate and the operator total are always computed identically.
+ * AL SHAJAR STATIONERY — Smart Print Gateway
+ * Shared VAT-inclusive AED pricing engine. (AL SHAJAR TEAM)
  *
- * All money is handled internally in "baisa" (1/1000 of an OMR) to avoid
- * floating point drift. Output is rounded to 3 decimals.
+ * All listed prices already include 5% UAE VAT. The VAT breakdown is
+ * reverse-calculated from the final VAT-inclusive total, never added on top.
+ * The same engine runs in the browser and on the Node.js server.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -13,266 +13,195 @@
   'use strict';
 
   const DEFAULT_PRICING = {
-    currency: 'OMR',
+    currency: 'AED',
     vatPercent: 5,
-    minimumCharge: 0.5,
+    bwBlockPages: 8,
     rates: {
-      bwPerA4Side: 0.025,
-      colorPerA4Side: 0.15,
-      sizeMultipliers: { A4: 1, A3: 2, A5: 0.7, Letter: 1, Legal: 1.3 },
-      paperMultipliers: { plain: 1, recycled: 0.95, heavy1: 1.25, heavy2: 1.5, photo: 2.5, transparency: 3 },
-      duplexFactor: 0.95,
-      finishing: { collate: 0, group: 0, stapleCollate: 0.5, ecoStaple: 0.3, booklet: 0.75, fold: 0.2 },
-      extras: { lamination: 0.3, cutting: 0.1, rushPercent: 20 }
+      A4: { bwBlockPrice: 1, colorPagePrice: 1 },
+      A5: { bwBlockPrice: 1, colorPagePrice: 1 },
+      A3: { bwPagePrice: 2, colorPagePrice: 3 }
     }
   };
 
-  const PAPER_LABELS = {
-    A3: 'A3', A4: 'A4', A5: 'A5', Letter: 'Letter', Legal: 'Legal'
-  };
-  const PAPER_TYPES = {
-    plain: 'Plain 64–105 gsm', recycled: 'Recycled', heavy1: 'Heavy 1 106–150 gsm',
-    heavy2: 'Heavy 2 151–220 gsm', photo: 'Photo paper', transparency: 'Transparency'
-  };
-  const PAPER_MM = {
-    A3: [297, 420], A4: [210, 297], A5: [148, 210],
-    Letter: [215.9, 279.4], Legal: [215.9, 355.6]
-  };
-  const MM_PER_PT = 25.4 / 72;
+  const DEFAULT_DELIVERY = { fee: 10, freeThreshold: 50 };
 
-  function num(v, fallback) {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : fallback;
+  function round2(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round((n + Number.EPSILON) * 100) / 100;
   }
 
-  function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
-
-  function money(baisa) { return Math.round(baisa) / 1000; }
-
-  function mergeRates(custom) {
-    const base = JSON.parse(JSON.stringify(DEFAULT_PRICING));
-    if (!custom) return base;
-    const out = Object.assign({}, base, custom);
-    out.rates = Object.assign({}, base.rates, custom.rates || {});
-    out.rates.sizeMultipliers = Object.assign({}, base.rates.sizeMultipliers, (custom.rates || {}).sizeMultipliers || {});
-    out.rates.paperMultipliers = Object.assign({}, base.rates.paperMultipliers, (custom.rates || {}).paperMultipliers || {});
-    out.rates.finishing = Object.assign({}, base.rates.finishing, (custom.rates || {}).finishing || {});
-    out.rates.extras = Object.assign({}, base.rates.extras, (custom.rates || {}).extras || {});
-    return out;
+  function clamp(value, min, max) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return min;
+    return Math.min(max, Math.max(min, n));
   }
 
-  /**
-   * Number of paper tiles a single logical page needs in Poster mode.
-   * Mirrors the geometry used by the client preview so the estimate matches.
-   */
-  function posterTilesFor(doc, settings, docs) {
-    const canon = settings.canon || {};
-    const poster = settings.poster || {};
-    const size = PAPER_MM[canon.pageSize] || PAPER_MM.A4;
-    const scale = clamp(num(poster.tileScale, 100), 10, 400) / 100;
-    const overlapMm = clamp(num(poster.overlap, 0), 0, 2) * 25.4;
-
-    let orientation = settings.orientation;
-    if (orientation !== 'portrait' && orientation !== 'landscape') {
-      const first = docs && docs[0];
-      orientation = first && num(first.pageW, 0) > num(first.pageH, 0) ? 'landscape' : 'portrait';
-    }
-    const paperW = orientation === 'landscape' ? size[1] : size[0];
-    const paperH = orientation === 'landscape' ? size[0] : size[1];
-    const pageW = num(doc.pageW, 0) > 0 ? num(doc.pageW, 0) * MM_PER_PT : paperW;
-    const pageH = num(doc.pageH, 0) > 0 ? num(doc.pageH, 0) * MM_PER_PT : paperH;
-
-    const stepW = Math.max(10, paperW - overlapMm);
-    const stepH = Math.max(10, paperH - overlapMm);
-    const cols = clamp(Math.ceil(Math.max(1, pageW * scale - overlapMm) / stepW), 1, 12);
-    const rows = clamp(Math.ceil(Math.max(1, pageH * scale - overlapMm) / stepH), 1, 12);
-    return cols * rows;
-  }
-
-  function nupPerSheet(settings) {
-    const nup = settings.nup || {};
-    const valid = [1, 2, 4, 6, 8, 9, 12, 16];
-    let per = Math.round(num(nup.pagesPerSheet, 4));
-    if (!valid.includes(per)) {
-      const cols = clamp(Math.round(num(nup.customCols, 2)), 1, 8);
-      let rows = clamp(Math.round(num(nup.customRows, 2)), 1, 8);
-      while (cols * rows > 16 && rows > 1) rows -= 1;
-      per = cols * rows;
-    }
-    return clamp(per, 1, 16);
-  }
-
-  /**
-   * @param {Object} input
-   * @param {Array}  input.documents  [{pages, colorPages, pageW, pageH}]
-   * @param {Object} input.settings   normalized print settings
-   * @param {Object} input.pricing    pricing config (optional)
-   */
-  function calculate(input) {
-    const pricing = mergeRates((input && input.pricing) || null);
-    const settings = (input && input.settings) || {};
-    const canon = settings.canon || {};
-    const docs = Array.isArray(input && input.documents) ? input.documents : [];
-
-    const copies = clamp(Math.round(num(canon.copies, 1)), 1, 9999);
-    const colorMode = canon.colorMode || 'auto';
-    const isColor = colorMode === 'auto';
-    const size = canon.pageSize || 'A4';
-    const paperType = canon.paperType || 'plain';
-    const sizingMode = settings.sizingMode || 'size';
-    const poster = sizingMode === 'poster';
-    const duplex = !poster && (canon.printStyle === '2sided' || canon.printStyle === 'booklet' || sizingMode === 'booklet');
-    const booklet = !poster && (canon.printStyle === 'booklet' || sizingMode === 'booklet');
-
-    const sizeMul = num(pricing.rates.sizeMultipliers[size], 1);
-    const paperMul = num(pricing.rates.paperMultipliers[paperType], 1);
-    const duplexFactor = duplex ? num(pricing.rates.duplexFactor, 0.95) : 1;
-    const bwRate = num(pricing.rates.bwPerA4Side, 0.025);
-    const colorRate = num(pricing.rates.colorPerA4Side, 0.15);
-
-    let logicalPages = 0;
-    let colorPages = 0;
-    let bwPages = 0;
-    let posterSheets = 0;
-    let pageCostBase = 0;
-    docs.forEach(function (doc) {
-      const p = Math.max(0, Math.round(num(doc.pages, 0)));
-      const cp = clamp(Math.round(num(doc.colorPages, isColor ? p : 0)), 0, p);
-      logicalPages += p;
-      if (isColor) { colorPages += cp; bwPages += p - cp; }
-      else { bwPages += p; }
-      const tiles = poster ? posterTilesFor(doc, settings, docs) : 1;
-      posterSheets += p * tiles;
-      const docColor = isColor ? cp : 0;
-      const docBw = isColor ? p - cp : p;
-      pageCostBase += (docColor * colorRate * 1000 * sizeMul * paperMul +
-        docBw * bwRate * 1000 * sizeMul * paperMul) * tiles;
-    });
-
-    const paddedPages = booklet ? Math.ceil(logicalPages / 4) * 4 : logicalPages;
-    const blankPages = paddedPages - logicalPages;
-
-    const pageCost = pageCostBase * copies * duplexFactor;
-
-    const finishingKey = canon.stapleCollate || 'collate';
-    let finishingFee = num(pricing.rates.finishing[finishingKey], 0);
-    if (booklet) finishingFee += num(pricing.rates.finishing.booklet, 0);
-    if (settings.extras && settings.extras.folding) finishingFee += num(pricing.rates.finishing.fold, 0);
-    const finishingCost = finishingFee * 1000 * copies;
-
-    let sidesPerCopy;
-    if (poster) sidesPerCopy = posterSheets;
-    else if (booklet) sidesPerCopy = Math.ceil(paddedPages / 2);
-    else if (sizingMode === 'multiple') sidesPerCopy = Math.ceil(paddedPages / nupPerSheet(settings));
-    else sidesPerCopy = paddedPages;
-    const sheetsPerCopy = duplex ? Math.ceil(sidesPerCopy / 2) : sidesPerCopy;
-    const totalSheets = sheetsPerCopy * copies;
-    const extras = settings.extras || {};
-    let extrasCost = 0;
-    const extraLines = [];
-    if (extras.lamination) {
-      const v = num(pricing.rates.extras.lamination, 0) * 1000 * totalSheets;
-      extrasCost += v;
-      extraLines.push({ label: 'Lamination', detail: totalSheets + ' sheets', amount: money(v) });
-    }
-    if (extras.cutting) {
-      const v = num(pricing.rates.extras.cutting, 0) * 1000 * totalSheets;
-      extrasCost += v;
-      extraLines.push({ label: 'Cutting / trimming', detail: totalSheets + ' sheets', amount: money(v) });
-    }
-
-    let subtotal = pageCost + finishingCost + extrasCost;
-    const minimum = num(pricing.minimumCharge, 0) * 1000;
-    let minimumAdjustment = 0;
-    if (subtotal > 0 && subtotal < minimum) {
-      minimumAdjustment = minimum - subtotal;
-      subtotal = minimum;
-    }
-    let rushCost = 0;
-    if (extras.rush) {
-      rushCost = subtotal * (num(pricing.rates.extras.rushPercent, 20) / 100);
-      subtotal += rushCost;
-      extraLines.push({ label: 'Rush service', detail: pricing.rates.extras.rushPercent + '%', amount: money(rushCost) });
-    }
-    const vat = subtotal * (num(pricing.vatPercent, 0) / 100);
-    const total = subtotal + vat;
-
-    const lines = [];
-    lines.push({
-      label: isColor ? 'Colour pages' : 'Black & white pages',
-      detail: (isColor
-        ? colorPages + ' colour + ' + bwPages + ' B&W × ' + copies
-        : bwPages + ' pages × ' + copies) + (poster ? ' · ' + posterSheets + ' poster sheets/copy' : ''),
-      amount: money(pageCost)
-    });
-    if (duplex) {
-      lines.push({ label: 'Duplex / paper saving', detail: Math.round((1 - duplexFactor) * 100) + '% off', amount: -money(pageCost / duplexFactor * (1 - duplexFactor)) });
-    }
-    if (finishingFee > 0) {
-      lines.push({
-        label: booklet ? 'Booklet finishing' : finishingKey === 'stapleCollate' ? 'Stapling' : finishingKey === 'ecoStaple' ? 'Eco staple-free binding' : 'Finishing',
-        detail: copies + ' set' + (copies > 1 ? 's' : ''),
-        amount: money(finishingCost)
-      });
-    }
-    if (blankPages > 0) {
-      lines.push({ label: 'Booklet padding', detail: blankPages + ' blank page' + (blankPages > 1 ? 's' : ''), amount: 0 });
-    }
-    extraLines.forEach(function (l) { lines.push(l); });
-    if (minimumAdjustment > 0) {
-      lines.push({ label: 'Minimum order adjustment', detail: 'Shop minimum', amount: money(minimumAdjustment) });
-    }
-
+  function mergePricing(custom) {
+    const source = custom || {};
+    const rates = source.rates || {};
     return {
-      currency: pricing.currency || 'OMR',
-      copies: copies,
-      pages: logicalPages,
-      paddedPages: paddedPages,
-      colorPages: colorPages,
-      bwPages: bwPages,
-      sheets: totalSheets,
-      sheetsPerCopy: sheetsPerCopy,
-      sides: poster ? totalSheets : sidesPerCopy * copies,
-      poster: poster,
-      posterSheets: posterSheets,
-      duplex: duplex,
-      booklet: booklet,
-      size: size,
-      paperType: paperType,
-      paperTypeLabel: PAPER_TYPES[paperType] || paperType,
-      paperLabel: PAPER_LABELS[size] || size,
-      lines: lines,
-      subtotal: money(subtotal),
-      vatPercent: num(pricing.vatPercent, 0),
-      vat: money(vat),
-      total: money(total),
-      estimatedMinutes: estimateMinutes(poster ? totalSheets : sidesPerCopy * copies, isColor ? colorPages * copies : 0, canon.resolution, booklet),
-      minimumApplied: minimumAdjustment > 0
+      currency: 'AED',
+      vatPercent: Number.isFinite(Number(source.vatPercent)) ? Number(source.vatPercent) : DEFAULT_PRICING.vatPercent,
+      bwBlockPages: Math.max(1, Math.round(Number(source.bwBlockPages) || DEFAULT_PRICING.bwBlockPages)),
+      rates: {
+        A4: {
+          bwBlockPrice: Number((rates.A4 || {}).bwBlockPrice ?? DEFAULT_PRICING.rates.A4.bwBlockPrice),
+          colorPagePrice: Number((rates.A4 || {}).colorPagePrice ?? DEFAULT_PRICING.rates.A4.colorPagePrice)
+        },
+        A5: {
+          bwBlockPrice: Number((rates.A5 || {}).bwBlockPrice ?? DEFAULT_PRICING.rates.A5.bwBlockPrice),
+          colorPagePrice: Number((rates.A5 || {}).colorPagePrice ?? DEFAULT_PRICING.rates.A5.colorPagePrice)
+        },
+        A3: {
+          bwPagePrice: Number((rates.A3 || {}).bwPagePrice ?? DEFAULT_PRICING.rates.A3.bwPagePrice),
+          colorPagePrice: Number((rates.A3 || {}).colorPagePrice ?? DEFAULT_PRICING.rates.A3.colorPagePrice)
+        }
+      }
     };
   }
 
-  function estimateMinutes(sides, colorSides, resolution, booklet) {
-    if (!sides) return 0;
-    const ppm = colorSides > 0 ? 42 : 55;
-    const resolutionFactor = Number(resolution) >= 1200 ? 1.25 : 1;
-    const setup = booklet ? 3 : 1.5;
-    return Math.max(1, Math.round(setup + (sides / ppm) * resolutionFactor + (booklet ? sides * 0.02 : 0)));
+  function mergeDelivery(custom) {
+    const source = custom || {};
+    return {
+      fee: Math.max(0, Number(source.fee ?? DEFAULT_DELIVERY.fee)),
+      freeThreshold: Math.max(0, Number(source.freeThreshold ?? DEFAULT_DELIVERY.freeThreshold))
+    };
   }
 
-  function formatMoney(amount, currency) {
-    const cur = currency || 'OMR';
-    const n = Number(amount) || 0;
-    return n.toFixed(3) + ' ' + cur;
+  /**
+   * Calculate a VAT-inclusive AED quote.
+   *
+   * @param {Object} input
+   * @param {number} input.pageCount   Selected PDF pages (not sheets).
+   * @param {number} input.copies
+   * @param {string} input.size        A4 | A5 | A3
+   * @param {boolean|string} input.color true/"color" or false/"bw"
+   * @param {string} input.fulfillment pickup | delivery
+   * @param {Object} input.pricing
+   * @param {Object} input.delivery
+   */
+  function calculate(input) {
+    const opts = input || {};
+    const pricing = mergePricing(opts.pricing);
+    const delivery = mergeDelivery(opts.delivery);
+    const vatPercent = clamp(pricing.vatPercent, 0, 100);
+
+    const pageCount = Math.max(0, Math.round(Number(opts.pageCount) || 0));
+    const copies = clamp(Math.round(Number(opts.copies) || 1), 1, 999);
+    const isColor = opts.color === true || opts.color === 'color';
+    const size = ['A4', 'A5', 'A3'].indexOf(String(opts.size)) >= 0 ? String(opts.size) : 'A4';
+    const fulfillment = opts.fulfillment === 'delivery' ? 'delivery' : 'pickup';
+    const billablePages = pageCount * copies;
+
+    let printTotal = 0;
+    let printDetail = '';
+    let blocks = 0;
+
+    if (billablePages > 0) {
+      if (size === 'A3') {
+        const unit = isColor ? pricing.rates.A3.colorPagePrice : pricing.rates.A3.bwPagePrice;
+        printTotal = billablePages * unit;
+        printDetail = billablePages + ' A3 page' + (billablePages === 1 ? '' : 's') + ' × ' + money(unit);
+      } else if (isColor) {
+        const unit = pricing.rates[size].colorPagePrice;
+        printTotal = billablePages * unit;
+        printDetail = billablePages + ' ' + size + ' colour page' + (billablePages === 1 ? '' : 's') + ' × ' + money(unit);
+      } else {
+        blocks = Math.ceil(billablePages / pricing.bwBlockPages);
+        printTotal = blocks * pricing.rates[size].bwBlockPrice;
+        printDetail = billablePages + ' ' + size + ' B&W page' + (billablePages === 1 ? '' : 's') +
+          ' · ' + blocks + ' × ' + pricing.bwBlockPages + '-page block' +
+          (pricing.rates[size].bwBlockPrice === 1 ? '' : ' × ' + money(pricing.rates[size].bwBlockPrice));
+      }
+    }
+
+    printTotal = round2(printTotal);
+
+    const qualifiesFree = fulfillment === 'delivery' && printTotal >= delivery.freeThreshold;
+    const deliveryFee = fulfillment === 'delivery' && !qualifiesFree ? round2(delivery.fee) : 0;
+    const total = round2(printTotal + deliveryFee);
+    const subtotalExVat = round2(total / (1 + vatPercent / 100));
+    const vat = round2(total - subtotalExVat);
+
+    const lines = [];
+    lines.push({
+      key: 'printing',
+      label: (isColor ? 'Colour printing' : 'Black & white printing') + ' · ' + size,
+      detail: printDetail || 'No pages selected',
+      amount: printTotal,
+      inclusive: true
+    });
+
+    if (fulfillment === 'delivery') {
+      lines.push({
+        key: 'delivery',
+        label: 'Home delivery',
+        detail: qualifiesFree
+          ? 'Free — order is ' + money(delivery.freeThreshold) + ' or more'
+          : 'Order is under ' + money(delivery.freeThreshold),
+        amount: deliveryFee,
+        free: qualifiesFree,
+        inclusive: true
+      });
+    }
+
+    return {
+      currency: 'AED',
+      vatPercent: vatPercent,
+      pageCount: pageCount,
+      copies: copies,
+      billablePages: billablePages,
+      size: size,
+      color: isColor,
+      fulfillment: fulfillment,
+      blocks: blocks,
+      printTotal: printTotal,
+      deliveryFee: deliveryFee,
+      freeDelivery: qualifiesFree,
+      freeDeliveryThreshold: round2(delivery.freeThreshold),
+      freeDeliveryRemaining: fulfillment === 'delivery' && !qualifiesFree
+        ? round2(delivery.freeThreshold - printTotal)
+        : 0,
+      total: total,
+      subtotalExVat: subtotalExVat,
+      vat: vat,
+      lines: lines
+    };
+  }
+
+  function money(value) {
+    const n = round2(value);
+    return 'AED ' + n.toFixed(2);
+  }
+
+  function formatAED(value) {
+    return money(value);
+  }
+
+  function describeRate(size, color, pricing) {
+    const p = mergePricing(pricing);
+    if (size === 'A3') {
+      return color
+        ? 'A3 colour: AED ' + p.rates.A3.colorPagePrice.toFixed(2) + ' per page'
+        : 'A3 black & white: AED ' + p.rates.A3.bwPagePrice.toFixed(2) + ' per page';
+    }
+    if (color) {
+      return size + ' colour: AED ' + p.rates[size].colorPagePrice.toFixed(2) + ' per page';
+    }
+    return size + ' black & white: AED ' + p.rates[size].bwBlockPrice.toFixed(2) +
+      ' per ' + p.bwBlockPages + ' pages (or part of ' + p.bwBlockPages + ')';
   }
 
   return {
     DEFAULT_PRICING: DEFAULT_PRICING,
-    PAPER_LABELS: PAPER_LABELS,
-    PAPER_TYPES: PAPER_TYPES,
-    mergeRates: mergeRates,
+    DEFAULT_DELIVERY: DEFAULT_DELIVERY,
     calculate: calculate,
-    estimateMinutes: estimateMinutes,
-    formatMoney: formatMoney,
+    mergePricing: mergePricing,
+    mergeDelivery: mergeDelivery,
+    round2: round2,
+    formatAED: formatAED,
+    describeRate: describeRate,
     clamp: clamp
   };
 });
