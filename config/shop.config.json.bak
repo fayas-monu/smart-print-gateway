@@ -1,0 +1,85 @@
+{
+  "shop": {
+    "name": "AL SHAJAR STATIONERY",
+    "shortName": "SHS",
+    "tagline": "Smart Print Gateway",
+    "phone": "",
+    "whatsapp": "",
+    "email": "",
+    "address": "United Arab Emirates",
+    "timezone": "Asia/Dubai",
+    "welcome": "Upload your files, choose your options and send the job to our print desk. We will review and print it.",
+    "pickupNote": "Collect your prints from the counter and quote your job number.",
+    "deliveryNote": "We will call you when your delivery is on the way.",
+    "footerNote": "© 2026 AL SHAJAR STATIONERY. All rights reserved."
+  },
+  "server": {
+    "port": 4173,
+    "host": "0.0.0.0",
+    "retentionDays": 30,
+    "maxFileMB": 50,
+    "maxJobMB": 120,
+    "maxPages": 500,
+    "sessionHours": 12,
+    "printMode": "simulate",
+    "defaultPrinterId": "canon-c5760i",
+    "sumatraPath": "",
+    "sofficePath": "",
+    "lpPath": "",
+    "printTimeoutSeconds": 180,
+    "autoRefreshSeconds": 12
+  },
+  "delivery": {
+    "fee": 10,
+    "freeThreshold": 50
+  },
+  "pricing": {
+    "currency": "AED",
+    "vatPercent": 5,
+    "bwBlockPages": 8,
+    "rates": {
+      "A4": {
+        "bwBlockPrice": 1,
+        "colorPagePrice": 1
+      },
+      "A5": {
+        "bwBlockPrice": 1,
+        "colorPagePrice": 1
+      },
+      "A3": {
+        "bwPagePrice": 2,
+        "colorPagePrice": 3
+      }
+    }
+  },
+  "printers": [
+    {
+      "id": "canon-c5760i",
+      "name": "Canon iR-ADV C5760i",
+      "model": "imageRUNNER ADVANCE C5760i",
+      "systemName": "Canon iR-ADV C5760i",
+      "location": "Counter 1 · Colour",
+      "capabilities": [
+        "color",
+        "duplex",
+        "staple",
+        "a3"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "canon-c5550",
+      "name": "Canon iR-ADV C5550",
+      "model": "imageRUNNER ADVANCE C5550",
+      "systemName": "Canon iR-ADV C5550",
+      "location": "Counter 2 · Mono",
+      "capabilities": [
+        "mono",
+        "duplex",
+        "staple",
+        "a3"
+      ],
+      "enabled": true
+    }
+  ]
+}
