@@ -1,19 +1,9 @@
 @echo off
-title Smart Print Gateway
+rem AL SHAJAR STATIONERY - Smart Print Gateway (Windows)
+rem Starts the print gateway on the LAN interface. Print mode: simulate.
+setlocal
 cd /d "%~dp0.."
-where node >nul 2>nul
-if errorlevel 1 (
-  echo.
-  echo  Node.js was not found on this computer.
-  echo  Install the LTS build from https://nodejs.org and run this file again.
-  echo.
-  pause
-  exit /b 1
-)
-echo.
-echo  Starting Smart Print Gateway...
-echo  Customer portal:  http://localhost:4173
-echo  Operator console: http://localhost:4173/dashboard
-echo.
-node server.js --open
-pause
+set "NODE_EXE=C:\Program Files\nodejs\node.exe"
+if not exist "%NODE_EXE%" set "NODE_EXE=node"
+"%NODE_EXE%" server.js %*
+exit /b %ERRORLEVEL%
