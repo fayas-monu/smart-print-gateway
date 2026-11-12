@@ -1,0 +1,151 @@
+[
+  {
+    "id": "SHS-261112-RCF9",
+    "token": "a6ba3dbd63f5ed7202fdfcf871cf0691199dddac50c1889a",
+    "createdAt": "2026-11-12T12:43:14.372Z",
+    "updatedAt": "2026-11-12T12:46:11.802Z",
+    "status": "completed",
+    "customer": {
+      "name": "Final Check",
+      "phone": "054 111 2222",
+      "address": "",
+      "note": "Quick accept test."
+    },
+    "fulfillment": "pickup",
+    "payment": "cash",
+    "settings": {
+      "paper": "A4",
+      "color": "bw",
+      "duplex": true,
+      "nup": 2,
+      "orientation": "auto",
+      "copies": 1,
+      "pageRange": {
+        "mode": "all",
+        "value": ""
+      }
+    },
+    "documents": [
+      {
+        "id": "doc-1",
+        "name": "sample.pdf",
+        "originalName": "sample.pdf",
+        "convertedFrom": "",
+        "mime": "application/pdf",
+        "size": 16784,
+        "kind": "pdf",
+        "pageCount": 10,
+        "pages": [
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          },
+          {
+            "width": 595.28,
+            "height": 841.89
+          }
+        ],
+        "storedName": "doc-1-original.pdf"
+      }
+    ],
+    "totalDocumentPages": 10,
+    "pageCount": 10,
+    "plan": {
+      "nup": 2,
+      "duplex": true,
+      "sides": 5,
+      "sheets": 3,
+      "outputSides": 6
+    },
+    "printReady": {
+      "storedName": "print-ready.pdf",
+      "size": 29011,
+      "pages": 6
+    },
+    "pricing": {
+      "currency": "AED",
+      "vatPercent": 5,
+      "pageCount": 10,
+      "copies": 1,
+      "billablePages": 10,
+      "size": "A4",
+      "color": false,
+      "fulfillment": "pickup",
+      "blocks": 2,
+      "printTotal": 2,
+      "deliveryFee": 0,
+      "freeDelivery": false,
+      "freeDeliveryThreshold": 50,
+      "freeDeliveryRemaining": 0,
+      "total": 2,
+      "subtotalExVat": 1.9,
+      "vat": 0.1,
+      "lines": [
+        {
+          "key": "printing",
+          "label": "Black & white printing · A4",
+          "detail": "10 A4 B&W pages · 2 × 8-page block",
+          "amount": 2,
+          "inclusive": true
+        }
+      ]
+    },
+    "printerId": "canon-c5760i",
+    "timeline": [
+      {
+        "at": "2026-11-12T12:43:14.372Z",
+        "status": "pending",
+        "message": "Job received by the print desk.",
+        "actor": "customer"
+      },
+      {
+        "at": "2026-11-12T12:46:09.583Z",
+        "status": "printing",
+        "message": "Sent to Canon iR-ADV C5760i (Counter 1 · Colour).",
+        "actor": "operator"
+      },
+      {
+        "at": "2026-11-12T12:46:11.802Z",
+        "status": "completed",
+        "message": "Print simulated. No hardware was used.",
+        "actor": "system"
+      }
+    ],
+    "warnings": [],
+    "rejectionReason": "",
+    "error": "",
+    "completedAt": "2026-11-12T12:46:11.802Z"
+  }
+]
