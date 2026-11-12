@@ -1,492 +1,614 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#070b12">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Operator Console — Smart Print Gateway</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Operator Console · AL SHAJAR STATIONERY</title>
+  <meta name="description" content="PIN-protected operator console for the AL SHAJAR STATIONERY Smart Print Gateway. Review the live queue, preview jobs and send print-ready files to the Canon printer.">
+  <meta name="theme-color" content="#0b1f17">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/css/app.css">
-  <link rel="stylesheet" href="/assets/css/dashboard.css">
+  <link rel="stylesheet" href="/assets/css/base.css?v=20261112">
+  <link rel="stylesheet" href="/assets/css/dashboard.css?v=20261112">
 </head>
 <body class="dash-body">
-<div class="ambient" aria-hidden="true"></div>
 
-<!-- ============================ LOGIN ============================ -->
-<section class="login-screen" id="loginScreen">
-  <div class="login-visual">
-    <a class="brand" href="/" aria-label="Smart Print Gateway home">
-      <span class="brand-mark"><span data-icon="printer" data-icon-size="21"></span></span>
-      <span class="brand-text"><strong>Smart Print</strong><small>Gateway</small></span>
-    </a>
+  <!-- Icon sprite -->
+  <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="i-queue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="6" rx="1.6"/><rect x="3" y="14" width="18" height="6" rx="1.6"/><path d="M7 7h.01M7 17h.01"/>
+      </symbol>
+      <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5V10H9"/><path d="M12 7.5V12l3 1.8"/>
+      </symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.7 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.7a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.3 9v.05a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/>
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 14.5v2.5"/>
+      </symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>
+      </symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3l18 18"/><path d="M10.6 6.2A10.6 10.6 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3 3.6"/><path d="M6.3 6.9C3.6 8.7 2 12 2 12s3.5 6 10 6a10 10 0 0 0 3-.44"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 11a8 8 0 1 0-2 5.5"/><path d="M20 5v6h-6"/>
+      </symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 7h16M4 12h16M4 17h16"/>
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6 6 18"/>
+      </symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 1.9"/>
+      </symbol>
+      <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 8V3.5h10V8"/><rect x="3.5" y="8" width="17" height="8" rx="2"/><path d="M7 13.5h10v7H7z"/><path d="M17.5 11v.01"/>
+      </symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.6L16.5 9"/>
+      </symbol>
+      <symbol id="i-cash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.4"/><path d="M6 9.5v.01M18 14.5v.01"/>
+      </symbol>
+      <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/><path d="M6.5 14.5h3"/>
+      </symbol>
+      <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2.5 6.5h10v10h-10z"/><path d="M12.5 9.5H17l3 3v4h-7.5z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="16.5" cy="18" r="1.8"/>
+      </symbol>
+      <symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 10v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9"/><path d="M3 10l2-5h14l2 5"/><path d="M3 10a3 3 0 0 0 5 2 3 3 0 0 0 4 0 3 3 0 0 0 4 0 3 3 0 0 0 5-2"/><path d="M9 20v-5h6v5"/>
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.5v11"/><path d="m7.5 10 4.5 4.5 4.5-4.5"/><path d="M4.5 20h15"/>
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M10 11v6M14 11v6"/>
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.5 21 20H3z"/><path d="M12 9v5"/><path d="M12 17v.01"/>
+      </symbol>
+      <symbol id="i-pages" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="7" y="3.5" width="13" height="16" rx="2"/><path d="M4 7v13.5h11"/>
+      </symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>
+      </symbol>
+      <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>
+      </symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17.5 17.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z"/>
+      </symbol>
+      <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 3.5h11L20.5 8v12.5a1 1 0 0 1-1 1h-14a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M8 3.5V9h7"/><rect x="7.5" y="13" width="9" height="6.5" rx="1"/>
+      </symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2.5 8.5a15 15 0 0 1 19 0"/><path d="M5.5 12a10.5 10.5 0 0 1 13 0"/><path d="M8.5 15.5a6 6 0 0 1 7 0"/><path d="M12 19v.01"/>
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3 5 6v5.5c0 4.2 2.9 7.6 7 9.5 4.1-1.9 7-5.3 7-9.5V6z"/><path d="m9 12 2 2 4-4"/>
+      </symbol>
+      <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.5 13.6 8 18 9.6 13.6 11.2 12 15.7 10.4 11.2 6 9.6 10.4 8z"/>
+        <path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14"/>
+      </symbol>
+    </defs>
+  </svg>
 
-    <div class="login-copy">
-      <span class="eyebrow"><span data-icon="shield" data-icon-size="14"></span> Secure operator console</span>
-      <h1>Run the print desk<br><em>without the chaos.</em></h1>
-      <p>Review every incoming job, inspect the exact imposed sheets, accept or reject in one tap, and watch the Canon printers work through the queue.</p>
-      <ul class="login-points">
-        <li><span data-icon="zap" data-icon-size="15"></span><span><strong>Live queue</strong> with instant new-job alerts over the shop network.</span></li>
-        <li><span data-icon="eye" data-icon-size="15"></span><span><strong>Print-ready preview</strong> of the imposed PDF before anything reaches the printer.</span></li>
-        <li><span data-icon="gauge" data-icon-size="15"></span><span><strong>Diagnostics and pricing</strong> in one place, with no cloud dependency.</span></li>
-      </ul>
-    </div>
-
-    <div class="login-foot">
-      <span class="dot"></span>
-      Local-only · jobs never leave this shop
-    </div>
+  <!-- Loading splash -->
+  <div class="dash-boot" id="boot-view">
+    <span class="spinner is-dark" aria-hidden="true"></span>
+    <span>Connecting to the print desk…</span>
   </div>
 
-  <div class="login-panel">
-    <div class="login-card">
-      <div class="login-logo"><span data-icon="printerCheck" data-icon-size="24"></span></div>
-      <h2>Operator sign in</h2>
-      <p>Enter the shop PIN to open the dashboard.</p>
+  <!-- ============================== Login ============================== -->
+  <div class="login-view" id="login-view" hidden>
+    <section class="login-brand-panel">
+      <a class="brand" href="/" aria-label="AL SHAJAR STATIONERY customer portal">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img">
+            <path d="M18 44V20h6l8 12 8-12h6v24h-6V30l-8 11-8-11v14z" fill="#e6cd93"/>
+            <path d="M16 50h32" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>AL SHAJAR</strong>
+          <span>Stationery · SHS</span>
+        </span>
+      </a>
 
-      <div class="pin-display" id="pinDisplay" aria-hidden="true"></div>
+      <div class="login-hero">
+        <span class="eyebrow" style="color: #e6cd93">Operator console</span>
+        <h1>Run the print desk <em>with confidence.</em></h1>
+        <p>Every customer job arrives here in real time. Preview the exact print-ready layout, check the AED total and send it straight to the Canon imageRUNNER ADVANCE.</p>
+        <ul class="login-points">
+          <li><svg aria-hidden="true"><use href="#i-check-circle"></use></svg><span>Live queue with payment, delivery and VAT-inclusive totals.</span></li>
+          <li><svg aria-hidden="true"><use href="#i-check-circle"></use></svg><span>Vector print-ready PDF built for the chosen paper, N-up and duplex.</span></li>
+          <li><svg aria-hidden="true"><use href="#i-check-circle"></use></svg><span>One scan-to-open QR code for every phone on the shop Wi-Fi.</span></li>
+        </ul>
+      </div>
 
-      <form id="loginForm" autocomplete="off">
-        <label class="sr-only" for="pinInput">Operator PIN</label>
-        <input type="password" id="pinInput" class="pin-input" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="current-password" placeholder="PIN" aria-label="Operator PIN">
-        <div class="login-error" id="loginError" hidden></div>
-        <button class="btn primary block lg" id="loginBtn" type="submit" disabled>
-          <span data-icon="lock" data-icon-size="17"></span> Unlock dashboard
+      <p class="login-footer">© 2026 AL SHAJAR STATIONERY. All rights reserved.</p>
+    </section>
+
+    <section class="login-side">
+      <form class="login-card" id="login-form" autocomplete="off">
+        <span class="login-lock" aria-hidden="true"><svg><use href="#i-lock"></use></svg></span>
+        <h2>Operator sign in</h2>
+        <p>Enter the print desk PIN. This console controls the queue and the printer, so keep the PIN private.</p>
+
+        <div class="pin-field">
+          <label class="field-label" for="pin-input">Console PIN</label>
+          <input class="input" id="pin-input" name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="current-password" aria-describedby="login-error" required>
+          <button class="pin-toggle" id="pin-toggle" type="button" aria-label="Show PIN" aria-pressed="false">
+            <svg aria-hidden="true"><use href="#i-eye"></use></svg>
+          </button>
+        </div>
+
+        <div class="login-error" id="login-error" role="alert" aria-live="polite"></div>
+
+        <button class="btn btn-primary btn-lg btn-block" id="login-submit" type="submit">
+          <svg aria-hidden="true"><use href="#i-lock"></use></svg>
+          Unlock console
         </button>
+
+        <p class="login-hint" id="login-hint" hidden>This console is still using the default PIN <strong>1234</strong>. Change it in Settings after signing in.</p>
+
+        <div class="login-links">
+          <a href="/">← Customer portal</a>
+          <a href="#" id="login-help">Need help?</a>
+        </div>
       </form>
-
-      <div class="keypad" id="keypad" aria-label="PIN keypad">
-        <button type="button" data-key="1">1</button>
-        <button type="button" data-key="2">2</button>
-        <button type="button" data-key="3">3</button>
-        <button type="button" data-key="4">4</button>
-        <button type="button" data-key="5">5</button>
-        <button type="button" data-key="6">6</button>
-        <button type="button" data-key="7">7</button>
-        <button type="button" data-key="8">8</button>
-        <button type="button" data-key="9">9</button>
-        <button type="button" data-key="clear" class="keypad-fn">Clear</button>
-        <button type="button" data-key="0">0</button>
-        <button type="button" data-key="back" class="keypad-fn" aria-label="Delete last digit"><span data-icon="chevronLeft" data-icon-size="17"></span></button>
-      </div>
-
-      <div class="login-hint" id="loginHint">Default PIN is <strong>1234</strong> — change it in Settings → Security.</div>
-      <a href="/" class="login-back"><span data-icon="arrowLeft" data-icon-size="14"></span> Back to customer portal</a>
-    </div>
+    </section>
   </div>
-</section>
 
-<!-- ============================ APP ============================ -->
-<div class="dash-app" id="dashApp" hidden>
-  <div class="side-scrim" id="sideScrim" hidden></div>
+  <!-- =============================== App =============================== -->
+  <div class="app" id="app" hidden>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-  <aside class="dash-side" id="dashSide">
-    <a class="brand side-brand" href="/" aria-label="Smart Print Gateway">
-      <span class="brand-mark"><span data-icon="printer" data-icon-size="20"></span></span>
-      <span class="brand-text"><strong>Smart Print</strong><small>Gateway</small></span>
-    </a>
+    <aside class="sidebar" id="sidebar" aria-label="Operator navigation">
+      <a class="brand" href="/dashboard" aria-label="Operator console home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img">
+            <path d="M18 44V20h6l8 12 8-12h6v24h-6V30l-8 11-8-11v14z" fill="#e6cd93"/>
+            <path d="M16 50h32" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>AL SHAJAR</strong>
+          <span>Operator · SHS</span>
+        </span>
+      </a>
 
-    <div class="side-shop" id="sideShop">
-      <span class="shop-dot" id="sideDot"></span>
-      <div><strong id="sideShopName">Print desk</strong><small id="sideShopMeta">Operator console</small></div>
-    </div>
+      <span class="sidebar-label">Print desk</span>
+      <nav class="side-nav">
+        <button class="nav-item is-active" type="button" data-view="queue">
+          <svg aria-hidden="true"><use href="#i-queue"></use></svg>
+          <span>Live queue</span>
+          <span class="nav-count" id="nav-queue-count">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="history">
+          <svg aria-hidden="true"><use href="#i-history"></use></svg>
+          <span>Job history</span>
+        </button>
+        <button class="nav-item" type="button" data-view="settings">
+          <svg aria-hidden="true"><use href="#i-settings"></use></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
 
-    <nav class="dash-nav" id="dashNav" aria-label="Console sections">
-      <button class="dash-nav-btn active" data-view="queue">
-        <span data-icon="inbox" data-icon-size="17"></span><span>Live queue</span><span class="nav-badge" id="navPending">0</span>
-      </button>
-      <button class="dash-nav-btn" data-view="history">
-        <span data-icon="history" data-icon-size="17"></span><span>Job history</span>
-      </button>
-      <button class="dash-nav-btn" data-view="printers">
-        <span data-icon="printer" data-icon-size="17"></span><span>Printers</span><span class="nav-dot" id="navPrinterDot"></span>
-      </button>
-      <button class="dash-nav-btn" data-view="stats">
-        <span data-icon="chart" data-icon-size="17"></span><span>Statistics</span>
-      </button>
-      <button class="dash-nav-btn" data-view="settings">
-        <span data-icon="settings" data-icon-size="17"></span><span>Settings</span>
-      </button>
-    </nav>
+      <div class="sidebar-spacer"></div>
 
-    <div class="side-foot">
-      <div class="side-status">
-        <span class="dot" id="sideStatusDot"></span>
-        <div><strong id="sideStatus">Connecting…</strong><small id="sideStatusSub">Live queue stream</small></div>
+      <div class="sidebar-status">
+        <div class="ss-row"><span>Connection</span><strong id="side-conn">Connecting…</strong></div>
+        <div class="ss-row"><span>Print mode</span><strong id="side-mode">—</strong></div>
+        <div class="ss-row"><span>Queue</span><strong id="side-queue">0 waiting</strong></div>
       </div>
-      <a class="btn ghost block sm" href="/" target="_blank" rel="noopener"><span data-icon="external" data-icon-size="14"></span> Customer portal</a>
-      <div class="side-version" id="sideVersion">Smart Print Gateway</div>
-    </div>
-  </aside>
 
-  <div class="dash-main">
-    <header class="dash-top">
-      <div class="dash-heading">
-        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open navigation"><span data-icon="menu" data-icon-size="17"></span></button>
-        <div>
-          <h1 id="viewTitle">Live queue</h1>
-          <p id="viewSubtitle">Review incoming jobs and release them to the printers.</p>
-        </div>
+      <div class="sidebar-footer">
+        <a class="btn btn-gold btn-sm" href="/" target="_blank" rel="noopener">
+          <svg aria-hidden="true"><use href="#i-user"></use></svg>
+          Portal
+        </a>
+        <button class="btn btn-outline btn-sm" id="logout-btn" type="button">
+          <svg aria-hidden="true"><use href="#i-logout"></use></svg>
+          Lock
+        </button>
       </div>
-      <div class="dash-top-actions">
-        <div class="connection-pill" id="connPill"><span class="dot"></span><span id="connText">Connecting…</span></div>
-        <button class="icon-btn" id="soundBtn" title="Sound alerts" aria-label="Toggle sound alerts"><span data-icon="volume" data-icon-size="16"></span></button>
-        <button class="icon-btn" id="notifyBtn" title="Desktop notifications" aria-label="Enable desktop notifications"><span data-icon="bell" data-icon-size="16"></span></button>
-        <button class="icon-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme"><span data-theme-icon></span></button>
-        <button class="icon-btn" id="lockBtn" title="Lock console" aria-label="Lock console"><span data-icon="lock" data-icon-size="16"></span></button>
-        <button class="btn primary sm" id="refreshBtn"><span data-icon="refresh" data-icon-size="15"></span> Refresh</button>
-      </div>
-    </header>
 
-    <div class="dash-banner" id="pinWarning" hidden>
-      <span data-icon="shield" data-icon-size="16"></span>
-      <span><strong>Default PIN in use.</strong> Change it in Settings → Operator security before the shop opens.</span>
-      <button class="btn sm ghost" id="pinWarningBtn">Open security</button>
-    </div>
+      <p class="login-footer">© 2026 AL SHAJAR STATIONERY. All rights reserved.</p>
+    </aside>
 
-    <div class="dash-scroll" id="dashScroll">
-      <!-- ======================= QUEUE ======================= -->
-      <section class="view active" id="view-queue">
-        <div class="kpi-grid">
-          <div class="kpi warn">
-            <div class="kpi-icon"><span data-icon="clock" data-icon-size="18"></span></div>
-            <div><span>Awaiting approval</span><strong id="kpiPending">0</strong><small id="kpiPendingSub">No jobs waiting</small></div>
-          </div>
-          <div class="kpi accent">
-            <div class="kpi-icon"><span data-icon="printer" data-icon-size="18"></span></div>
-            <div><span>Printing now</span><strong id="kpiPrinting">0</strong><small id="kpiPrintingSub">Idle</small></div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-icon"><span data-icon="inbox" data-icon-size="18"></span></div>
-            <div><span>Jobs today</span><strong id="kpiToday">0</strong><small id="kpiTodaySub">0 completed</small></div>
-          </div>
-          <div class="kpi success">
-            <div class="kpi-icon"><span data-icon="dollar" data-icon-size="18"></span></div>
-            <div><span>Revenue today</span><strong id="kpiRevenue">0.000 OMR</strong><small>Completed jobs</small></div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-icon"><span data-icon="gauge" data-icon-size="18"></span></div>
-            <div><span>Average wait</span><strong id="kpiWait">0 min</strong><small>Time to acceptance</small></div>
-          </div>
+    <div class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menu-btn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+          <svg aria-hidden="true"><use href="#i-menu"></use></svg>
+        </button>
+
+        <div class="topbar-title">
+          <h1 id="view-title">Live queue</h1>
+          <p id="view-sub">Jobs appear here the moment a customer sends them.</p>
         </div>
 
-        <div class="queue-layout">
-          <div class="panel queue-panel">
-            <div class="queue-toolbar">
-              <div class="segmented queue-filter" id="statusFilter" role="tablist" aria-label="Filter jobs">
-                <button data-filter="pending" class="active" role="tab">Pending <b id="countPending">0</b></button>
-                <button data-filter="active" role="tab">Active <b id="countActive">0</b></button>
-                <button data-filter="completed" role="tab">Completed</button>
-                <button data-filter="rejected" role="tab">Rejected</button>
-                <button data-filter="all" role="tab">All</button>
-              </div>
-              <div class="queue-tools">
-                <label class="search-box">
-                  <span data-icon="search" data-icon-size="14"></span>
-                  <input type="search" id="queueSearch" placeholder="Search job, customer, phone or file" autocomplete="off">
-                </label>
-                <button class="icon-btn" id="queueExportBtn" title="Export jobs as CSV" aria-label="Export CSV"><span data-icon="download" data-icon-size="16"></span></button>
+        <div class="topbar-actions">
+          <span class="pill" id="default-pin-pill" hidden><span class="dot"></span>Default PIN active</span>
+          <span class="pill" id="mode-pill"><span class="dot"></span><span id="mode-pill-text">Simulate mode</span></span>
+          <span class="pill" id="conn-pill"><span class="dot"></span><span id="conn-pill-text">Live</span></span>
+          <button class="btn btn-outline btn-icon" id="global-refresh" type="button" aria-label="Refresh queue" title="Refresh queue">
+            <svg aria-hidden="true"><use href="#i-refresh"></use></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-scroll">
+
+        <!-- ============================ Queue ============================ -->
+        <section class="view" id="view-queue" aria-label="Live print queue">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <span class="stat-icon is-gold"><svg aria-hidden="true"><use href="#i-clock"></use></svg></span>
+              <div>
+                <div class="stat-value" id="stat-pending">0</div>
+                <div class="stat-label">Waiting for approval</div>
               </div>
             </div>
-            <div class="job-list" id="jobList"></div>
-            <div class="queue-empty" id="queueEmpty" hidden>
-              <div class="empty-illustration small"><span data-icon="inbox" data-icon-size="34"></span></div>
-              <h2 id="queueEmptyTitle">Queue is clear</h2>
-              <p id="queueEmptyText">New jobs appear here the moment a customer sends them from the portal.</p>
+            <div class="stat-card">
+              <span class="stat-icon is-ink"><svg aria-hidden="true"><use href="#i-print"></use></svg></span>
+              <div>
+                <div class="stat-value" id="stat-printing">0</div>
+                <div class="stat-label">Printing now</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon is-ok"><svg aria-hidden="true"><use href="#i-check-circle"></use></svg></span>
+              <div>
+                <div class="stat-value" id="stat-completed">0</div>
+                <div class="stat-label">Completed today</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon"><svg aria-hidden="true"><use href="#i-cash"></use></svg></span>
+              <div>
+                <div class="stat-value" id="stat-revenue">AED 0.00</div>
+                <div class="stat-label">Collected today · VAT incl.</div>
+              </div>
             </div>
           </div>
 
-          <aside class="queue-rail">
-            <div class="panel rail-card">
+          <div class="queue-layout">
+            <section class="panel" aria-labelledby="queue-heading">
               <div class="panel-head">
-                <div><h2>Activity</h2><p>Latest movements</p></div>
-                <button class="icon-btn sm" id="activityRefreshBtn" title="Refresh activity" aria-label="Refresh activity"><span data-icon="refresh" data-icon-size="14"></span></button>
+                <h2 id="queue-heading">Incoming jobs</h2>
+                <span class="pill" id="queue-count-pill">0 waiting</span>
+                <div class="head-actions">
+                  <button class="btn btn-outline btn-sm" id="queue-refresh" type="button">
+                    <svg aria-hidden="true"><use href="#i-refresh"></use></svg>
+                    Refresh
+                  </button>
+                </div>
               </div>
-              <div class="rail-list" id="activityList"></div>
-            </div>
-            <div class="panel rail-card">
-              <div class="panel-head">
-                <div><h2>Printers</h2><p>Shop hardware</p></div>
-                <span class="badge" id="printModeBadge">SIMULATE</span>
-              </div>
-              <div class="printer-mini" id="printerMini"></div>
-            </div>
-          </aside>
-        </div>
-      </section>
+              <div class="queue-list" id="queue-list" aria-live="polite"></div>
+            </section>
 
-      <!-- ======================= HISTORY ======================= -->
-      <section class="view" id="view-history" hidden>
-        <div class="panel history-panel">
-          <div class="queue-toolbar">
-            <div class="segmented queue-filter" id="historyFilter" role="tablist" aria-label="Filter history">
-              <button data-history-filter="all" class="active" role="tab">All</button>
-              <button data-history-filter="completed" role="tab">Completed</button>
-              <button data-history-filter="rejected" role="tab">Rejected</button>
-              <button data-history-filter="failed" role="tab">Failed</button>
-              <button data-history-filter="cancelled" role="tab">Cancelled</button>
-            </div>
-            <div class="queue-tools">
-              <label class="search-box">
-                <span data-icon="search" data-icon-size="14"></span>
-                <input type="search" id="historySearch" placeholder="Search history" autocomplete="off">
-              </label>
-              <button class="btn ghost sm" id="historyExportBtn"><span data-icon="download" data-icon-size="14"></span> Export CSV</button>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table" id="historyTable">
-              <thead>
-                <tr><th>Job</th><th>Created</th><th>Customer</th><th>Files</th><th>Pages</th><th>Total</th><th>Status</th><th></th></tr>
-              </thead>
-              <tbody id="historyBody"></tbody>
-            </table>
-          </div>
-          <div class="queue-empty" id="historyEmpty" hidden>
-            <div class="empty-illustration small"><span data-icon="history" data-icon-size="34"></span></div>
-            <h2>No jobs in this view</h2>
-            <p>Completed, rejected and cancelled jobs are kept here for reprints.</p>
-          </div>
-        </div>
-      </section>
+            <div class="queue-side">
+              <section class="panel qr-panel" aria-labelledby="qr-heading">
+                <div class="panel-head">
+                  <h2 id="qr-heading">Scan to print</h2>
+                  <span class="pill pill-gold">Shop Wi-Fi</span>
+                </div>
+                <div class="panel-body">
+                  <div class="qr-box" id="qr-box" aria-label="QR code for the customer portal"></div>
+                  <p class="qr-url" id="qr-url">Finding the shop address…</p>
+                  <p class="qr-hint">Customers scan this code with their phone camera to open the portal. No app or login needed.</p>
+                  <div class="network-list" id="network-list"></div>
+                </div>
+              </section>
 
-      <!-- ======================= PRINTERS ======================= -->
-      <section class="view" id="view-printers" hidden>
-        <div class="printer-grid" id="printerGrid"></div>
-        <div class="settings-grid">
-          <div class="panel settings-section">
+              <section class="panel mode-panel" aria-labelledby="mode-heading">
+                <div class="panel-head">
+                  <h2 id="mode-heading">Print destination</h2>
+                  <span class="pill" id="mode-state-pill">—</span>
+                </div>
+                <div class="panel-body">
+                  <div class="mode-headline"><span class="mode-dot" id="mode-dot"></span><span id="mode-headline">Checking drivers…</span></div>
+                  <p id="mode-note">The gateway checks SumatraPDF and the Canon print queue at start-up.</p>
+                  <div id="mode-printers"></div>
+                  <button class="btn btn-outline btn-sm" id="mode-settings" type="button">
+                    <svg aria-hidden="true"><use href="#i-settings"></use></svg>
+                    Printer settings
+                  </button>
+                </div>
+              </section>
+
+              <section class="panel" aria-labelledby="recent-heading">
+                <div class="panel-head">
+                  <h2 id="recent-heading">Recent activity</h2>
+                  <div class="head-actions">
+                    <button class="btn btn-ghost btn-sm" type="button" data-view="history">View all</button>
+                  </div>
+                </div>
+                <div class="recent-list" id="recent-list" aria-live="polite"></div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================== History =========================== -->
+        <section class="view" id="view-history" aria-label="Job history" hidden>
+          <section class="panel">
             <div class="panel-head">
-              <div><h2>Print mode &amp; tools</h2><p>What the server can hand to the operating system</p></div>
-              <button class="btn ghost sm" id="diagRefreshBtn"><span data-icon="refresh" data-icon-size="14"></span> Re-scan</button>
-            </div>
-            <div class="settings-body" id="diagnosticsBody"></div>
-          </div>
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Quick controls</h2><p>Switch mode or default printer instantly</p></div></div>
-            <div class="settings-body" id="printerActions"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ======================= STATS ======================= -->
-      <section class="view" id="view-stats" hidden>
-        <div class="kpi-grid" id="statsKpis"></div>
-        <div class="stats-grid">
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Jobs — last 7 days</h2><p>Daily volume and completed revenue</p></div><span class="badge" id="chartTotal">0 jobs</span></div>
-            <div class="chart" id="jobsChart"></div>
-          </div>
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Paper mix</h2><p>Most-used sheet size across all jobs</p></div></div>
-            <div class="paper-mix" id="paperMix"></div>
-          </div>
-        </div>
-        <div class="stats-grid">
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Recent activity</h2><p>Latest queue and printer events</p></div></div>
-            <div class="rail-list" id="statsActivity"></div>
-          </div>
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Operations snapshot</h2><p>Server, storage and retention</p></div></div>
-            <div class="settings-body" id="opsSummary"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ======================= SETTINGS ======================= -->
-      <section class="view" id="view-settings" hidden>
-        <div class="settings-actions">
-          <div>
-            <strong>Shop configuration</strong>
-            <small id="settingsSaved">Loaded from config/shop.config.json</small>
-          </div>
-          <div class="settings-actions-right">
-            <button class="btn ghost sm" id="settingsReloadBtn"><span data-icon="refresh" data-icon-size="14"></span> Reload</button>
-            <button class="btn primary" id="saveSettingsBtn"><span data-icon="check" data-icon-size="16"></span> Save changes</button>
-          </div>
-        </div>
-
-        <div class="settings-grid">
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Shop details</h2><p>Shown to customers in the portal</p></div><span class="badge accent">Customer-facing</span></div>
-            <div class="settings-body">
-              <div class="grid-2">
-                <label class="field"><span>Shop name</span><input type="text" data-setting="shop.name" maxlength="120"></label>
-                <label class="field"><span>Phone</span><input type="text" data-setting="shop.phone" maxlength="60"></label>
-              </div>
-              <div class="grid-2">
-                <label class="field"><span>WhatsApp</span><input type="text" data-setting="shop.whatsapp" maxlength="60"></label>
-                <label class="field"><span>Address</span><input type="text" data-setting="shop.address" maxlength="240"></label>
-              </div>
-              <label class="field"><span>Welcome message</span><textarea data-setting="shop.welcome" maxlength="500"></textarea></label>
-              <div class="grid-2">
-                <label class="field"><span>Payment note</span><input type="text" data-setting="shop.paymentNote" maxlength="300"></label>
-                <label class="field"><span>Pickup note</span><input type="text" data-setting="shop.pickupNote" maxlength="300"></label>
-              </div>
-              <div class="grid-3">
-                <label class="field"><span>Opens</span><input type="time" data-setting="shop.hours.open"></label>
-                <label class="field"><span>Closes</span><input type="time" data-setting="shop.hours.close"></label>
-                <label class="field"><span>Timezone</span><input type="text" data-setting="shop.hours.timezone" maxlength="60" placeholder="Asia/Muscat"></label>
+              <h2>Job history</h2>
+              <span class="pill" id="history-total-pill">0 jobs</span>
+              <div class="head-actions">
+                <a class="btn btn-outline btn-sm" id="export-csv" href="/api/operator/export.csv">
+                  <svg aria-hidden="true"><use href="#i-download"></use></svg>
+                  Export CSV
+                </a>
+                <button class="btn btn-outline btn-sm" id="history-refresh" type="button">
+                  <svg aria-hidden="true"><use href="#i-refresh"></use></svg>
+                  Refresh
+                </button>
               </div>
             </div>
-          </div>
 
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Pricing</h2><p>Shared by the portal estimate and server total</p></div><span class="badge">OMR</span></div>
-            <div class="settings-body">
-              <div class="grid-3">
-                <label class="field"><span>VAT %</span><input type="number" min="0" max="50" step="0.5" data-setting="pricing.vatPercent"></label>
-                <label class="field"><span>Minimum charge</span><input type="number" min="0" step="0.001" data-setting="pricing.minimumCharge"></label>
-                <label class="field"><span>Duplex factor</span><input type="number" min="0" max="1" step="0.01" data-setting="pricing.rates.duplexFactor"></label>
+            <div class="panel-body">
+              <div class="filter-bar">
+                <div class="search-wrap">
+                  <svg aria-hidden="true"><use href="#i-search"></use></svg>
+                  <input class="input" id="history-search" type="search" placeholder="Search job number, name, phone or address" autocomplete="off">
+                </div>
+                <select class="select" id="history-status" aria-label="Filter by status">
+                  <option value="all">All jobs</option>
+                  <option value="pending">Waiting for approval</option>
+                  <option value="printing">Printing</option>
+                  <option value="completed">Completed</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="failed">Needs attention</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="queue">Open queue</option>
+                </select>
+                <select class="select" id="history-limit" aria-label="Rows per page">
+                  <option value="25">25 rows</option>
+                  <option value="50" selected>50 rows</option>
+                  <option value="100">100 rows</option>
+                </select>
               </div>
-              <div class="grid-2">
-                <label class="field"><span>B&amp;W per A4 side</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.bwPerA4Side"></label>
-                <label class="field"><span>Colour per A4 side</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.colorPerA4Side"></label>
-              </div>
-              <div class="form-section-title">Size multipliers</div>
-              <div class="rate-grid" id="sizeRates"></div>
-              <div class="form-section-title">Paper multipliers</div>
-              <div class="rate-grid" id="paperRates"></div>
-              <div class="form-section-title">Finishing fees</div>
-              <div class="rate-grid" id="finishRates"></div>
-              <div class="grid-2">
-                <label class="field"><span>Rush surcharge %</span><input type="number" min="0" max="100" step="1" data-setting="pricing.rates.extras.rushPercent"></label>
-                <label class="field"><span>Lamination per sheet</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.extras.lamination"></label>
-              </div>
-              <label class="field"><span>Cutting / trimming per sheet</span><input type="number" min="0" step="0.001" data-setting="pricing.rates.extras.cutting"></label>
             </div>
-          </div>
 
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Printing &amp; server</h2><p>Hardware hand-off and retention</p></div><span class="badge" id="serverModeBadge">SIMULATE</span></div>
-            <div class="settings-body">
-              <div class="grid-2">
-                <label class="field"><span>Print mode</span>
-                  <select data-setting="server.printMode">
-                    <option value="simulate">Simulate — safe demo</option>
-                    <option value="live">Live — send to printer</option>
-                  </select>
-                </label>
-                <label class="field"><span>Default printer</span><select data-setting="server.defaultPrinterId" id="defaultPrinterSelect"></select></label>
-              </div>
-              <div class="grid-3">
-                <label class="field"><span>Retention (days)</span><input type="number" min="1" max="3650" data-setting="server.retentionDays"></label>
-                <label class="field"><span>Max file (MB)</span><input type="number" min="1" max="500" data-setting="server.maxFileMB"></label>
-                <label class="field"><span>Max job (MB)</span><input type="number" min="1" max="1000" data-setting="server.maxJobMB"></label>
-              </div>
-              <label class="field"><span>SumatraPDF path (optional)</span><input type="text" data-setting="server.sumatraPath" placeholder="C:\\Program Files\\SumatraPDF\\SumatraPDF.exe"></label>
-              <label class="field"><span>LibreOffice soffice path (optional)</span><input type="text" data-setting="server.sofficePath" placeholder="C:\\Program Files\\LibreOffice\\program\\soffice.exe"></label>
-              <label class="field"><span>CUPS lp path (optional)</span><input type="text" data-setting="server.lpPath" placeholder="/usr/bin/lp"></label>
-              <div class="mode-note"><span data-icon="info" data-icon-size="14"></span><span>Live mode needs SumatraPDF on Windows or CUPS <code>lp</code> on Linux/macOS. LibreOffice converts Word and Excel. Keep simulate mode until a test page prints correctly.</span></div>
+            <div class="table-wrap">
+              <table class="jobs-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Job</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Job details</th>
+                    <th scope="col">Fulfilment</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Total</th>
+                    <th scope="col" class="cell-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+              </table>
             </div>
-          </div>
 
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Feature switches</h2><p>Turn portal capabilities on or off</p></div></div>
-            <div class="settings-body feature-grid">
-              <label class="switch-row"><input type="checkbox" data-setting="features.exactImposition"><span>Exact pre-imposed output</span></label>
-              <label class="switch-row"><input type="checkbox" data-setting="features.colorDetection"><span>Automatic colour detection</span></label>
-              <label class="switch-row"><input type="checkbox" data-setting="features.chatbot"><span>Print assistant</span></label>
-              <label class="switch-row"><input type="checkbox" data-setting="features.showPrices"><span>Show prices in portal</span></label>
-              <label class="switch-row"><input type="checkbox" data-setting="features.allowRush"><span>Allow rush service</span></label>
-              <label class="switch-row"><input type="checkbox" data-setting="features.allowLamination"><span>Allow lamination</span></label>
-              <label class="switch-row"><input type="checkbox" data-setting="features.requireCustomerName"><span>Require customer name</span></label>
+            <div class="table-foot">
+              <span id="history-foot">No jobs loaded yet.</span>
+              <span id="history-page-label"></span>
             </div>
-          </div>
+          </section>
+        </section>
 
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Operator security</h2><p>PIN protects this console only</p></div><span class="badge warn" id="pinStatusBadge">Default PIN</span></div>
-            <div class="settings-body">
-              <label class="field"><span>Current PIN</span><input type="password" id="currentPin" inputmode="numeric" maxlength="12" autocomplete="current-password"></label>
-              <div class="grid-2">
-                <label class="field"><span>New PIN (4–12 digits)</span><input type="password" id="newPin" inputmode="numeric" maxlength="12" autocomplete="new-password"></label>
-                <label class="field"><span>Confirm new PIN</span><input type="password" id="confirmPin" inputmode="numeric" maxlength="12" autocomplete="new-password"></label>
+        <!-- =========================== Settings ========================== -->
+        <section class="view" id="view-settings" aria-label="Shop settings" hidden>
+          <div class="settings-grid-2">
+
+            <section class="panel settings-card span-2">
+              <div class="panel-head">
+                <h2>Shop details</h2>
+                <span class="pill pill-gold">Shown to customers</span>
               </div>
-              <button class="btn soft block" id="changePinBtn"><span data-icon="shield" data-icon-size="15"></span> Change operator PIN</button>
-              <div class="field-hint mt-8">Changing the PIN signs out every other operator session.</div>
-            </div>
-          </div>
+              <form id="shop-form">
+                <div class="settings-form">
+                  <label class="field"><span class="field-label">Shop name</span><input class="input" id="shop-name" type="text" maxlength="80" required></label>
+                  <label class="field"><span class="field-label">Short name</span><input class="input" id="shop-short-name" type="text" maxlength="12" required></label>
+                  <label class="field"><span class="field-label">Phone</span><input class="input" id="shop-phone" type="tel" maxlength="40" placeholder="+971 …"></label>
+                  <label class="field"><span class="field-label">WhatsApp</span><input class="input" id="shop-whatsapp" type="tel" maxlength="40" placeholder="+971 …"></label>
+                  <label class="field"><span class="field-label">Email</span><input class="input" id="shop-email" type="email" maxlength="120" placeholder="printdesk@example.ae"></label>
+                  <label class="field"><span class="field-label">Address</span><input class="input" id="shop-address" type="text" maxlength="240"></label>
+                  <label class="field span-2"><span class="field-label">Welcome message</span><textarea class="textarea" id="shop-welcome" maxlength="500" rows="2"></textarea></label>
+                  <label class="field"><span class="field-label">Pickup note</span><textarea class="textarea" id="shop-pickup-note" maxlength="500" rows="2"></textarea></label>
+                  <label class="field"><span class="field-label">Delivery note</span><textarea class="textarea" id="shop-delivery-note" maxlength="500" rows="2"></textarea></label>
+                  <label class="field span-2"><span class="field-label">Footer note</span><input class="input" id="shop-footer-note" type="text" maxlength="240"></label>
+                </div>
+                <div class="settings-actions">
+                  <button class="btn btn-primary" type="submit"><svg aria-hidden="true"><use href="#i-save"></use></svg>Save shop details</button>
+                  <span class="field-hint">Time zone is fixed to Asia/Dubai so daily totals stay correct.</span>
+                </div>
+              </form>
+            </section>
 
-          <div class="panel settings-section">
-            <div class="panel-head"><div><h2>Data &amp; storage</h2><p>Local job store</p></div></div>
-            <div class="settings-body" id="dataBody"></div>
+            <section class="panel settings-card">
+              <div class="panel-head"><h2>VAT-inclusive pricing</h2><span class="pill">AED · 5% VAT</span></div>
+              <form id="pricing-form">
+                <div class="settings-form">
+                  <label class="field span-2"><span class="field-label">B&amp;W block size (pages)</span><input class="input" id="price-bw-block-pages" type="number" min="1" max="100" step="1" required><span class="field-hint">A4/A5 B&amp;W is charged per block of pages, or part of a block.</span></label>
+                  <div class="span-2 rate-inputs">
+                    <label>A4 B&amp;W block (AED)<input class="input" id="price-a4-bw" type="number" min="0" step="0.01" required></label>
+                    <label>A4 colour / page (AED)<input class="input" id="price-a4-color" type="number" min="0" step="0.01" required></label>
+                    <label>A5 B&amp;W block (AED)<input class="input" id="price-a5-bw" type="number" min="0" step="0.01" required></label>
+                    <label>A5 colour / page (AED)<input class="input" id="price-a5-color" type="number" min="0" step="0.01" required></label>
+                    <label>A3 B&amp;W / page (AED)<input class="input" id="price-a3-bw" type="number" min="0" step="0.01" required></label>
+                    <label>A3 colour / page (AED)<input class="input" id="price-a3-color" type="number" min="0" step="0.01" required></label>
+                  </div>
+                  <p class="span-2 field-hint">These are final customer prices. The receipt shows the included VAT only — it is never added again at checkout.</p>
+                </div>
+                <div class="settings-actions">
+                  <button class="btn btn-primary" type="submit"><svg aria-hidden="true"><use href="#i-save"></use></svg>Save pricing</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel settings-card">
+              <div class="panel-head"><h2>Home delivery</h2><span class="pill">UAE</span></div>
+              <form id="delivery-form">
+                <div class="settings-form">
+                  <label class="field"><span class="field-label">Delivery fee (AED)</span><input class="input" id="delivery-fee" type="number" min="0" max="1000" step="0.01" required><span class="field-hint">Applied below the free-delivery threshold.</span></label>
+                  <label class="field"><span class="field-label">Free delivery from (AED)</span><input class="input" id="delivery-threshold" type="number" min="0" max="10000" step="0.01" required><span class="field-hint">Order total after VAT. Use 0 for always free.</span></label>
+                </div>
+                <div class="settings-actions">
+                  <button class="btn btn-primary" type="submit"><svg aria-hidden="true"><use href="#i-save"></use></svg>Save delivery</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel settings-card span-2">
+              <div class="panel-head">
+                <h2>Printing &amp; server</h2>
+                <span class="pill" id="server-mode-pill">—</span>
+              </div>
+              <form id="server-form">
+                <div class="settings-form">
+                  <label class="field">
+                    <span class="field-label">Print mode</span>
+                    <select class="select" id="server-print-mode">
+                      <option value="simulate">Simulate — safe, no hardware</option>
+                      <option value="live">Live — send to the Canon printer</option>
+                    </select>
+                    <span class="field-hint">Start in simulate mode while you test. Live mode needs SumatraPDF on Windows.</span>
+                  </label>
+                  <label class="field">
+                    <span class="field-label">Default printer</span>
+                    <select class="select" id="server-default-printer"></select>
+                  </label>
+                  <label class="field"><span class="field-label">Keep finished jobs (days)</span><input class="input" id="server-retention" type="number" min="1" max="365" step="1" required></label>
+                  <label class="field"><span class="field-label">Auto refresh (seconds)</span><input class="input" id="server-refresh" type="number" min="5" max="120" step="1" required></label>
+                  <label class="field"><span class="field-label">Max file size (MB)</span><input class="input" id="server-max-file" type="number" min="1" max="300" step="1" required></label>
+                  <label class="field"><span class="field-label">Max total job size (MB)</span><input class="input" id="server-max-job" type="number" min="1" max="500" step="1" required></label>
+                  <label class="field"><span class="field-label">Max pages per job</span><input class="input" id="server-max-pages" type="number" min="1" max="2000" step="1" required></label>
+                  <label class="field"><span class="field-label">Operator session (hours)</span><input class="input" id="server-session" type="number" min="1" max="168" step="1" required></label>
+                  <label class="field"><span class="field-label">Print timeout (seconds)</span><input class="input" id="server-timeout" type="number" min="20" max="1200" step="1" required></label>
+                  <label class="field"><span class="field-label">Port</span><input class="input" id="server-port" type="number" min="1" max="65535" step="1" required><span class="field-hint">Changes apply after restarting the gateway.</span></label>
+                  <label class="field span-2"><span class="field-label">SumatraPDF path (Windows)</span><input class="input" id="server-sumatra" type="text" maxlength="500" placeholder="Leave blank to auto-detect"><span class="field-hint">Example: C:\Program Files\SumatraPDF\SumatraPDF.exe</span></label>
+                  <label class="field"><span class="field-label">LibreOffice path</span><input class="input" id="server-soffice" type="text" maxlength="500" placeholder="Leave blank to auto-detect"><span class="field-hint">Used to convert Word .docx files to PDF.</span></label>
+                  <label class="field"><span class="field-label">CUPS lp path (Linux/macOS)</span><input class="input" id="server-lp" type="text" maxlength="500" placeholder="Leave blank to auto-detect"></label>
+                </div>
+                <div class="settings-actions">
+                  <button class="btn btn-primary" type="submit"><svg aria-hidden="true"><use href="#i-save"></use></svg>Save printing &amp; server</button>
+                  <button class="btn btn-outline" id="run-diagnostics" type="button"><svg aria-hidden="true"><use href="#i-shield"></use></svg>Run diagnostics</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel settings-card span-2">
+              <div class="panel-head">
+                <h2>Canon printers</h2>
+                <span class="pill">Windows / CUPS queue names</span>
+                <div class="head-actions">
+                  <button class="btn btn-outline btn-sm" id="add-printer" type="button"><svg aria-hidden="true"><use href="#i-plus"></use></svg>Add printer</button>
+                  <button class="btn btn-primary btn-sm" id="save-printers" type="button"><svg aria-hidden="true"><use href="#i-save"></use></svg>Save printers</button>
+                </div>
+              </div>
+              <div class="printer-editor" id="printer-editor"></div>
+              <div class="settings-actions">
+                <span class="field-hint">The Windows queue name must match the installed Canon driver exactly. Capabilities are kept for existing printers.</span>
+              </div>
+            </section>
+
+            <section class="panel settings-card">
+              <div class="panel-head"><h2>Console PIN</h2><span class="pill" id="pin-state-pill">—</span></div>
+              <form id="pin-form" autocomplete="off">
+                <div class="settings-form">
+                  <label class="field span-2"><span class="field-label">Current PIN</span><input class="input" id="pin-current" type="password" inputmode="numeric" maxlength="12" autocomplete="current-password" required></label>
+                  <label class="field"><span class="field-label">New PIN</span><input class="input" id="pin-new" type="password" inputmode="numeric" maxlength="12" autocomplete="new-password" required><span class="field-hint">4 to 12 digits.</span></label>
+                  <label class="field"><span class="field-label">Confirm new PIN</span><input class="input" id="pin-confirm" type="password" inputmode="numeric" maxlength="12" autocomplete="new-password" required></label>
+                </div>
+                <div class="settings-actions">
+                  <button class="btn btn-primary" type="submit"><svg aria-hidden="true"><use href="#i-lock"></use></svg>Change PIN</button>
+                  <span class="field-hint">Changing the PIN signs out every other console session.</span>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel settings-card">
+              <div class="panel-head">
+                <h2>Diagnostics</h2>
+                <div class="head-actions">
+                  <button class="btn btn-ghost btn-sm" id="diag-refresh" type="button"><svg aria-hidden="true"><use href="#i-refresh"></use></svg>Refresh</button>
+                </div>
+              </div>
+              <div class="diag-grid" id="diagnostics-grid">
+                <div class="diag-row"><span>Loading…</span><strong>—</strong></div>
+              </div>
+            </section>
+
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ============================ JOB DETAIL ============================ -->
-<div class="modal-backdrop" id="jobModal" hidden>
-  <div class="modal job-modal" role="dialog" aria-modal="true" aria-labelledby="jmNumber">
-    <div class="modal-head">
-      <div class="job-modal-title">
-        <div class="job-modal-no" id="jmNumber">Job</div>
-        <div id="jmStatus"></div>
+  <!-- ============================ Job modal =========================== -->
+  <div class="modal job-modal" id="job-modal" role="dialog" aria-modal="true" aria-labelledby="job-modal-title" hidden>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <div>
+          <h2 id="job-modal-title">Job details</h2>
+          <div class="job-modal-head-meta" id="job-modal-meta"></div>
+        </div>
+        <button class="modal-close" type="button" data-close-modal aria-label="Close job details">
+          <svg aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
       </div>
-      <div class="job-modal-head-right">
-        <span class="small faint" id="jmCreated"></span>
-        <button class="modal-close" data-close="jobModal" aria-label="Close"><span data-icon="close"></span></button>
+
+      <div class="job-loading" id="job-loading">
+        <span class="spinner is-dark" aria-hidden="true"></span>
+        <span>Loading job…</span>
       </div>
-    </div>
-    <div class="modal-body job-modal-body">
-      <div class="job-detail-grid">
-        <div class="job-preview-pane">
-          <div class="preview-toolbar">
-            <div class="segmented" id="previewKindTabs">
-              <button data-kind="printReady" class="active">Print-ready</button>
-              <button data-kind="original">Original</button>
-            </div>
-            <div class="preview-actions">
-              <button class="icon-btn sm" id="previewDownloadBtn" title="Download this file" aria-label="Download file"><span data-icon="download" data-icon-size="14"></span></button>
-              <button class="icon-btn sm" id="previewReloadBtn" title="Reload preview" aria-label="Reload preview"><span data-icon="refresh" data-icon-size="14"></span></button>
+
+      <div class="job-modal-grid" id="job-modal-grid" hidden>
+        <div class="job-preview-panel">
+          <div class="job-preview-head">
+            <span>Print-ready preview</span>
+            <div class="head-actions">
+              <a class="btn btn-outline" id="job-open-pdf" href="#" target="_blank" rel="noopener">Open PDF</a>
+              <a class="btn btn-outline" id="job-download-pdf" href="#" download>Download</a>
             </div>
           </div>
-          <div class="preview-frame" id="previewFrame"></div>
-          <div class="preview-caption" id="previewCaption">Select a document</div>
-          <div class="doc-picker" id="docPicker"></div>
+          <iframe class="job-preview-frame" id="job-preview-frame" title="Print-ready PDF preview"></iframe>
+          <div class="job-preview-fallback" id="job-preview-fallback" hidden>
+            <p>No print-ready preview is available for this job. Open the original files below.</p>
+          </div>
         </div>
-        <div class="job-info-pane" id="jmInfo"></div>
+        <div id="job-detail-col"></div>
       </div>
     </div>
-    <div class="modal-foot" id="jmFoot"></div>
   </div>
-</div>
 
-<!-- ============================ REJECT ============================ -->
-<div class="modal-backdrop" id="rejectModal" hidden>
-  <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="rejectTitle">
-    <div class="modal-head">
-      <div><h2 id="rejectTitle">Reject this job</h2><p id="rejectSubtitle">The customer sees the reason in their tracker.</p></div>
-      <button class="modal-close" data-close="rejectModal" aria-label="Close"><span data-icon="close"></span></button>
-    </div>
-    <div class="modal-body">
-      <label class="field"><span>Reason</span>
-        <select id="rejectReason">
-          <option value="File is corrupted or cannot be opened">File is corrupted or cannot be opened</option>
-          <option value="Page size or layout needs adjustment">Page size or layout needs adjustment</option>
-          <option value="Payment or price query">Payment or price query</option>
-          <option value="Duplicate job">Duplicate job</option>
-          <option value="Customer asked to cancel">Customer asked to cancel</option>
-          <option value="Other — see note">Other — see note</option>
-        </select>
-      </label>
-      <label class="field"><span>Note to customer (optional)</span><textarea id="rejectNote" maxlength="300" placeholder="e.g. Please re-upload the PDF without a password."></textarea></label>
-      <div class="field-hint">This message appears in the customer’s job tracker.</div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close="rejectModal">Cancel</button>
-      <div class="right"><button class="btn danger" id="confirmRejectBtn"><span data-icon="xCircle" data-icon-size="15"></span> Reject job</button></div>
-    </div>
-  </div>
-</div>
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
 
-<div class="toast-stack" id="toasts"></div>
-
-<script src="/assets/js/icons.js"></script>
-<script src="/assets/js/ui.js"></script>
-<script src="/assets/js/dashboard.js"></script>
+  <script src="/shared/pricing.js"></script>
+  <script src="/assets/js/common.js?v=20261112"></script>
+  <script src="/assets/js/dashboard.js?v=20261112"></script>
 </body>
 </html>

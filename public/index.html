@@ -1,577 +1,692 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#070b12">
-  <meta name="description" content="Smart Print Gateway — upload, configure and send print jobs to the shop counter with live preview and pricing.">
-  <title>Smart Print Gateway — Print Portal</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AL SHAJAR STATIONERY · Smart Print Gateway</title>
+  <meta name="description" content="Upload PDF, Word or images and send your print job to AL SHAJAR STATIONERY. Live layout preview, AED prices with 5% VAT included, pickup or home delivery.">
+  <meta name="theme-color" content="#0b1f17">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/base.css">
   <link rel="stylesheet" href="/assets/css/app.css">
 </head>
-<body>
-<div class="ambient" aria-hidden="true"></div>
+<body class="portal-body">
 
-<header class="topbar">
-  <a class="brand" href="/" aria-label="Smart Print Gateway home">
-    <span class="brand-mark"><span data-icon="printer" data-icon-size="21"></span></span>
-    <span class="brand-text"><strong>Smart Print</strong><small>Gateway</small></span>
-  </a>
+  <!-- Icon sprite -->
+  <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M10 11v6M14 11v6"/>
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m4 12.5 5 5L20 6.5"/>
+      </symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.6L16.5 9"/>
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6 6 18"/>
+      </symbol>
+      <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m14 6-6 6 6 6"/>
+      </symbol>
+      <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m10 6 6 6-6 6"/>
+      </symbol>
+      <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.5 13.6 8 18 9.6 13.6 11.2 12 15.7 10.4 11.2 6 9.6 10.4 8z"/>
+        <path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>
+        <path d="M5 16l.6 1.4L7 18l-1.4.6L5 20l-.6-1.4L3 18l1.4-.6z"/>
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3 5 6v5.5c0 4.2 2.9 7.6 7 9.5 4.1-1.9 7-5.3 7-9.5V6z"/><path d="m9 12 2 2 4-4"/>
+      </symbol>
+      <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.2"/>
+      </symbol>
+      <symbol id="i-cash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.4"/><path d="M6 9.5v.01M18 14.5v.01"/>
+      </symbol>
+      <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/><path d="M6.5 14.5h3"/>
+      </symbol>
+      <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2.5 6.5h10v10h-10z"/><path d="M12.5 9.5H17l3 3v4h-7.5z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="16.5" cy="18" r="1.8"/>
+      </symbol>
+      <symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 10v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9"/><path d="M3 10l2-5h14l2 5"/><path d="M3 10a3 3 0 0 0 5 2 3 3 0 0 0 4 0 3 3 0 0 0 4 0 3 3 0 0 0 5-2"/><path d="M9 20v-5h6v5"/>
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 14.5v2.5"/>
+      </symbol>
+      <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 3 10.5 13.5"/><path d="M21 3 14.5 21l-4-7.5L3 9.5z"/>
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.5 21 20H3z"/><path d="M12 9v5"/><path d="M12 17v.01"/>
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 1.9"/>
+      </symbol>
+      <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 8V3.5h10V8"/><rect x="3.5" y="8" width="17" height="8" rx="2"/><path d="M7 13.5h10v7H7z"/><path d="M17.5 11v.01"/>
+      </symbol>
+      <symbol id="i-pages" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="7" y="3.5" width="13" height="16" rx="2"/><path d="M4 7v13.5h11"/>
+      </symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>
+      </symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2.5 8.5a15 15 0 0 1 19 0"/><path d="M5.5 12a10.5 10.5 0 0 1 13 0"/><path d="M8.5 15.5a6 6 0 0 1 7 0"/><path d="M12 19v.01"/>
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 11a8 8 0 1 0-2 5.5"/><path d="M20 5v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
 
-  <div class="shop-chip" title="Shop status">
-    <span class="dot" id="shopDot"></span>
-    <span id="shopName">Print desk</span>
-    <span class="shop-hours" id="shopHours">Connecting…</span>
-  </div>
+  <!-- ============================== Header ============================== -->
+  <header class="site-header">
+    <div class="shell">
+      <a class="brand" href="/" aria-label="AL SHAJAR STATIONERY home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img">
+            <path d="M18 44V20h6l8 12 8-12h6v24h-6V30l-8 11-8-11v14z" fill="#e6cd93"/>
+            <path d="M16 50h32" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>AL SHAJAR</strong>
+          <span>Stationery · SHS</span>
+        </span>
+      </a>
 
-  <div class="topbar-actions">
-    <button class="icon-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme"><span data-theme-icon></span></button>
-    <button class="btn ghost sm" id="historyBtn" title="Your recent jobs"><span data-icon="history" data-icon-size="15"></span><span>History</span></button>
-    <a class="btn ghost sm" href="/dashboard" target="_blank" id="dashboardLink" title="Open operator console"><span data-icon="layoutDashboard" data-icon-size="15"></span><span>Operator</span></a>
-    <div class="connection-pill" id="connectionPill" title="Backend connection"><span class="dot"></span><span id="connectionText">Connecting…</span></div>
-    <button class="btn primary sm" id="helpBtn"><span data-icon="sparkles" data-icon-size="15"></span><span>Print assistant</span></button>
-  </div>
-</header>
-
-<div class="demo-banner" id="offlineBanner" hidden>
-  <span data-icon="alertTriangle" data-icon-size="15"></span>
-  <span><strong>Preview mode</strong> — the print desk server is offline. You can explore every setting, but sending a job needs the shop server running.</span>
-  <button class="btn sm ghost" id="retryBtn">Retry connection</button>
-</div>
-
-<main class="workspace">
-  <!-- ============================ SETTINGS ============================ -->
-  <aside class="settings-panel panel" aria-label="Print settings">
-    <div class="panel-head">
-      <div>
-        <h2>Print setup</h2>
-        <p id="settingsSubtitle">Add a document to begin</p>
+      <div class="header-actions">
+        <span class="pill" id="live-pill"><span class="dot"></span><span id="live-pill-text">Print desk online</span></span>
+        <a class="btn btn-dark" href="/dashboard">
+          <svg aria-hidden="true"><use href="#i-lock"></use></svg>
+          <span class="btn-label">Operator</span>
+        </a>
       </div>
-      <button class="icon-btn sm" id="resetBtn" title="Reset all settings" aria-label="Reset settings"><span data-icon="refresh" data-icon-size="15"></span></button>
     </div>
+  </header>
 
-    <div class="panel-scroll">
-      <section class="doc-section">
-        <div class="section-head">
-          <h3>Documents <span class="count-badge" id="docCount">0</span></h3>
-          <button class="text-btn" id="sampleBtn">Load sample</button>
+  <main>
+    <!-- =============================== Hero ============================= -->
+    <section class="hero">
+      <div class="shell hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Smart Print Gateway</span>
+          <h1 class="display">Print brilliantly. <em>Pay simply.</em></h1>
+          <p class="lede" id="welcome-text">Upload your files, choose your options and send the job to our print desk. We will review and print it.</p>
+          <div class="hero-chips">
+            <span class="pill"><svg aria-hidden="true"><use href="#i-shield"></use></svg>AED · 5% VAT included</span>
+            <span class="pill"><svg aria-hidden="true"><use href="#i-print"></use></svg>Canon imageRUNNER ADVANCE</span>
+            <span class="pill"><svg aria-hidden="true"><use href="#i-wifi"></use></svg>Works on the shop Wi-Fi</span>
+          </div>
         </div>
 
-        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload documents">
-          <input type="file" id="fileInput" multiple hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.bmp,.tif,.tiff,application/pdf,image/*">
-          <div class="dropzone-icon"><span data-icon="upload" data-icon-size="20"></span></div>
+        <aside class="hero-rate-card" aria-labelledby="rate-heading">
+          <h2 id="rate-heading">Today’s print rates</h2>
+          <div class="rate-list" id="rate-list">
+            <div class="rate-row"><span class="rate-name">Loading rates…</span><span class="rate-value">—</span></div>
+          </div>
+          <p class="rate-note">
+            <svg aria-hidden="true"><use href="#i-info"></use></svg>
+            All prices are in AED and already include 5% UAE VAT. Nothing is added at checkout.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============================ Workspace =========================== -->
+    <div class="shell workspace">
+      <div class="workflow">
+
+        <!-- 01 · Files -->
+        <section class="card card-pad" id="files-card" aria-labelledby="files-heading">
+          <div class="card-head">
+            <span class="card-step">01</span>
+            <div>
+              <h2 class="card-title" id="files-heading">Add your files</h2>
+              <p class="card-sub">PDF, Word (.docx), JPG or PNG. We keep your files on the shop computer only.</p>
+            </div>
+          </div>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload files by browsing or drag and drop">
+            <span class="dropzone-icon" aria-hidden="true">
+              <svg><use href="#i-upload"></use></svg>
+            </span>
+            <span class="dropzone-title">Drag &amp; drop files here, or <span>browse</span></span>
+            <span class="dropzone-hint">Up to 12 files per job. You will see a live preview of the exact layout before sending.</span>
+            <span class="dropzone-actions">
+              <span class="btn btn-primary btn-sm" id="browse-btn">
+                <svg aria-hidden="true"><use href="#i-upload"></use></svg>
+                Choose files
+              </span>
+              <button type="button" class="btn btn-outline btn-sm" id="sample-btn">
+                <svg aria-hidden="true"><use href="#i-file"></use></svg>
+                Try a sample PDF
+              </button>
+            </span>
+            <input class="file-input" type="file" id="file-input" accept=".pdf,.docx,application/pdf,image/jpeg,image/png" multiple>
+          </div>
+
+          <div class="file-list" id="file-list" aria-live="polite"></div>
+          <div id="file-alert" hidden></div>
+        </section>
+
+        <!-- 02 · Options -->
+        <section class="card card-pad" id="options-card" aria-labelledby="options-heading">
+          <div class="card-head">
+            <span class="card-step">02</span>
+            <div>
+              <h2 class="card-title" id="options-heading">Choose print options</h2>
+              <p class="card-sub">The preview and the price update instantly. Paper and page price are separate from delivery.</p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <div class="field-block">
+              <span class="field-label">Paper size</span>
+              <div class="segmented" data-setting="paper" role="group" aria-label="Paper size">
+                <button type="button" data-value="A4" aria-pressed="true">A4<span class="sub">210 × 297</span></button>
+                <button type="button" data-value="A5" aria-pressed="false">A5<span class="sub">148 × 210</span></button>
+                <button type="button" data-value="A3" aria-pressed="false">A3<span class="sub">297 × 420</span></button>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <span class="field-label">Ink</span>
+              <div class="segmented" data-setting="color" role="group" aria-label="Ink colour">
+                <button type="button" data-value="bw" aria-pressed="true">Black &amp; white<span class="sub" id="rate-bw">—</span></button>
+                <button type="button" data-value="color" aria-pressed="false">Colour<span class="sub" id="rate-color">—</span></button>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <span class="field-label">Printed sides</span>
+              <div class="segmented" data-setting="duplex" role="group" aria-label="Printed sides">
+                <button type="button" data-value="false" aria-pressed="false">Single-sided</button>
+                <button type="button" data-value="true" aria-pressed="true">Double-sided<span class="sub">Saves paper</span></button>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <span class="field-label">Pages per sheet (N-up)</span>
+              <div class="segmented" data-setting="nup" role="group" aria-label="Pages per sheet">
+                <button type="button" data-value="1" aria-pressed="true">1-up</button>
+                <button type="button" data-value="2" aria-pressed="false">2-up</button>
+                <button type="button" data-value="4" aria-pressed="false">4-up</button>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <span class="field-label" for="orientation">Orientation</span>
+              <select class="select" id="orientation">
+                <option value="auto">Auto (match each page)</option>
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+
+            <div class="field-block">
+              <span class="field-label">Number of copies</span>
+              <div class="field-inline">
+                <div class="stepper">
+                  <button type="button" id="copies-minus" aria-label="Fewer copies">−</button>
+                  <output id="copies-value" aria-live="polite">1</output>
+                  <button type="button" id="copies-plus" aria-label="More copies">+</button>
+                </div>
+                <span class="field-hint">Applied to every selected page</span>
+              </div>
+            </div>
+
+            <div class="field-block span-2">
+              <span class="field-label">Pages to print</span>
+              <div class="range-mode" role="group" aria-label="Page range mode">
+                <button type="button" id="range-all" aria-pressed="true">All pages</button>
+                <button type="button" id="range-custom" aria-pressed="false">Choose pages</button>
+              </div>
+              <div class="range-input-wrap" id="range-input-wrap" hidden>
+                <input class="input" id="range-input" type="text" inputmode="text" placeholder="e.g. 1-4, 7, 10-12" autocomplete="off">
+              </div>
+              <div class="range-error" id="range-error" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 · Details -->
+        <section class="card card-pad" id="details-card" aria-labelledby="details-heading">
+          <div class="card-head">
+            <span class="card-step">03</span>
+            <div>
+              <h2 class="card-title" id="details-heading">Collection, delivery &amp; payment</h2>
+              <p class="card-sub">No payment is taken online. Pay at the counter or on delivery.</p>
+            </div>
+          </div>
+
+          <div class="choice-group" role="radiogroup" aria-label="Fulfilment method">
+            <label class="choice">
+              <input type="radio" name="fulfillment" value="pickup" checked>
+              <span class="choice-radio" aria-hidden="true"></span>
+              <span class="choice-body">
+                <span class="choice-title">
+                  <svg width="17" height="17" aria-hidden="true"><use href="#i-store"></use></svg>
+                  Store pickup
+                  <span class="pill pill-green">Free</span>
+                </span>
+                <span class="choice-desc">Collect from the AL SHAJAR STATIONERY counter when you receive the ready message.</span>
+              </span>
+            </label>
+
+            <label class="choice">
+              <input type="radio" name="fulfillment" value="delivery">
+              <span class="choice-radio" aria-hidden="true"></span>
+              <span class="choice-body">
+                <span class="choice-title">
+                  <svg width="17" height="17" aria-hidden="true"><use href="#i-truck"></use></svg>
+                  Home delivery
+                  <span class="pill" id="delivery-badge">—</span>
+                </span>
+                <span class="choice-desc" id="delivery-choice-desc">Delivery fee is added below the print price. Free above the order threshold.</span>
+              </span>
+            </label>
+          </div>
+
+          <div class="fulfilment-notes">
+            <svg aria-hidden="true"><use href="#i-info"></use></svg>
+            <span id="fulfilment-note">Collect your prints from the counter and quote your job number.</span>
+          </div>
+
+          <div class="delivery-fields" id="delivery-fields" hidden>
+            <div class="field">
+              <label class="field-label" for="customer-address">Delivery address <span class="req">*</span></label>
+              <textarea class="textarea" id="customer-address" placeholder="Building, street, area, emirate" maxlength="240"></textarea>
+              <span class="field-hint">We only deliver within the UAE. Our team may call to confirm the address.</span>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="field-block" style="margin-bottom:16px">
+            <span class="field-label">Payment method</span>
+            <div class="payment-options" role="radiogroup" aria-label="Payment method">
+              <label class="choice">
+                <input type="radio" name="payment" value="cash" checked>
+                <span class="choice-radio" aria-hidden="true"></span>
+                <span class="choice-body">
+                  <span class="choice-title"><svg width="17" height="17" aria-hidden="true"><use href="#i-cash"></use></svg> Cash</span>
+                  <span class="choice-desc">Pay at the counter or to the driver.</span>
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="payment" value="card">
+                <span class="choice-radio" aria-hidden="true"></span>
+                <span class="choice-body">
+                  <span class="choice-title"><svg width="17" height="17" aria-hidden="true"><use href="#i-card"></use></svg> Card</span>
+                  <span class="choice-desc">Card terminal at the counter or on delivery.</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="customer-name">Your name <span class="req">*</span></label>
+              <input class="input" id="customer-name" type="text" autocomplete="name" placeholder="Full name" maxlength="80">
+              <span class="field-error" id="error-name"></span>
+            </div>
+            <div class="field">
+              <label class="field-label" for="customer-phone">Mobile number <span class="req" id="phone-req" hidden>*</span></label>
+              <input class="input" id="customer-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="05x xxx xxxx" maxlength="30">
+              <span class="field-error" id="error-phone"></span>
+            </div>
+            <div class="field span-2">
+              <label class="field-label" for="customer-note">Note for the print desk <span class="muted tiny">(optional)</span></label>
+              <input class="input" id="customer-note" type="text" placeholder="e.g. staple each set, fold A5, call on arrival" maxlength="500">
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============================ Summary ============================ -->
+      <aside class="summary-col" aria-label="Order summary">
+        <section class="card preview-card">
+          <div class="preview-head">
+            <svg width="17" height="17" aria-hidden="true" style="color:var(--gold-600)"><use href="#i-pages"></use></svg>
+            <h2>Live preview</h2>
+            <span class="pill" id="preview-colour-pill">B&amp;W · A4</span>
+          </div>
+
+          <div class="preview-stage">
+            <div class="paper-frame" id="paper-frame">
+              <canvas id="preview-canvas" width="640" height="905" aria-label="Preview of the printed sheet layout"></canvas>
+              <div class="preview-empty" id="preview-empty">
+                <svg aria-hidden="true"><use href="#i-file"></use></svg>
+                <span>Add a file to see the exact sheet layout here.</span>
+              </div>
+              <div class="preview-loading" id="preview-loading" hidden>
+                <span class="spinner is-dark"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-nav">
+            <button type="button" id="preview-prev" aria-label="Previous side" disabled>
+              <svg aria-hidden="true"><use href="#i-left"></use></svg>
+            </button>
+            <span class="side-label" id="preview-side-label">No pages yet</span>
+            <button type="button" id="preview-next" aria-label="Next side" disabled>
+              <svg aria-hidden="true"><use href="#i-right"></use></svg>
+            </button>
+          </div>
+
+          <div class="preview-meta" id="preview-meta">
+            <span>Pages <strong id="meta-pages">0</strong></span>
+            <span>Sheets <strong id="meta-sheets">0</strong></span>
+            <span>Sides to print <strong id="meta-sides">0</strong></span>
+          </div>
+        </section>
+
+        <section class="card price-card" aria-labelledby="price-heading">
+          <div class="price-head">
+            <h2 id="price-heading">Order summary</h2>
+            <span class="pill pill-gold">VAT included</span>
+          </div>
+
+          <div class="price-lines" id="price-lines">
+            <div class="price-line">
+              <span class="pl-label">Printing</span>
+              <span class="pl-amount">AED 0.00</span>
+            </div>
+          </div>
+
+          <div class="price-total">
+            <span class="pt-label">Total to pay</span>
+            <span class="pt-value" id="price-total">AED 0.00</span>
+          </div>
+
+          <div class="vat-breakdown">
+            <div class="vb-row"><span>Subtotal before VAT</span><strong id="vat-subtotal">AED 0.00</strong></div>
+            <div class="vb-row"><span>UAE VAT (5%)</span><strong id="vat-amount">AED 0.00</strong></div>
+            <div class="vb-note" id="vat-note">VAT is included in the total above and shown for transparency only.</div>
+          </div>
+
+          <div class="price-actions">
+            <button class="btn btn-primary btn-lg btn-block" id="submit-btn" type="button">
+              <svg aria-hidden="true"><use href="#i-send"></use></svg>
+              Send job to print desk
+            </button>
+            <p class="submit-error" id="submit-error" aria-live="assertive"></p>
+            <p class="secure-note">
+              <svg aria-hidden="true"><use href="#i-lock"></use></svg>
+              No online payment. Our team checks every job before printing.
+            </p>
+          </div>
+        </section>
+
+        <div class="trust-strip">
+          <span><svg aria-hidden="true"><use href="#i-shield"></use></svg>VAT-compliant receipt</span>
+          <span><svg aria-hidden="true"><use href="#i-print"></use></svg>Canon quality</span>
+          <span><svg aria-hidden="true"><use href="#i-wifi"></use></svg>No app needed</span>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- =============================== Footer ============================= -->
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+              <path d="M18 44V20h6l8 12 8-12h6v24h-6V30l-8 11-8-11v14z" fill="#e6cd93"/>
+              <path d="M16 50h32" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </span>
           <div>
-            <strong>Drop files here</strong>
-            <span>or <u>browse</u> from this device</span>
+            <strong>AL SHAJAR STATIONERY</strong>
+            <p>Smart Print Gateway for the shop counter. Upload, preview and send — we handle the rest.</p>
           </div>
-          <div class="file-types"><span>PDF</span><span>DOCX</span><span>XLSX</span><span>IMG</span></div>
         </div>
-
-        <div class="doc-list" id="docList"></div>
-        <button class="doc-add" id="addDocBtn" hidden><span data-icon="plus" data-icon-size="14"></span> Add another document</button>
-      </section>
-
-      <div class="tabs" role="tablist" aria-label="Settings sections">
-        <button class="tab active" data-tab="layout" role="tab" aria-selected="true">Layout</button>
-        <button class="tab" data-tab="printer" role="tab" aria-selected="false">Printer</button>
-        <button class="tab" data-tab="presets" role="tab" aria-selected="false">Presets</button>
+        <nav class="footer-links" aria-label="Footer links">
+          <button type="button" data-open-modal="terms-modal">Terms &amp; Conditions</button>
+          <button type="button" data-open-modal="privacy-modal">Privacy Policy</button>
+          <a href="/dashboard">Operator console</a>
+        </nav>
       </div>
-
-      <!-- LAYOUT TAB -->
-      <div class="tab-panel active" id="tab-layout" role="tabpanel">
-        <div class="card">
-          <div class="card-head"><h3>Printer &amp; pages</h3><span class="badge" id="printerBadge">Colour</span></div>
-          <label class="field">
-            <span>Target printer</span>
-            <select id="printerSelect"></select>
-          </label>
-          <div class="field">
-            <span>Pages to print</span>
-            <div class="segmented" id="rangeType" role="group" aria-label="Page range type">
-              <button data-value="all" class="active">All</button>
-              <button data-value="current">Current</button>
-              <button data-value="custom">Range</button>
-            </div>
-            <input type="text" id="pageRange" placeholder="e.g. 1-5, 8, 11-13" disabled autocomplete="off" spellcheck="false">
-            <div class="field-hint" id="pageRangeHint">Add a document to see its pages</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><h3>Page sizing &amp; handling</h3></div>
-          <div class="mode-switch" id="sizingMode" role="group" aria-label="Sizing mode">
-            <button data-value="size" class="active">Size</button>
-            <button data-value="poster">Poster</button>
-            <button data-value="multiple">Multiple</button>
-            <button data-value="booklet">Booklet</button>
-          </div>
-
-          <div class="mode-panel" data-mode="size">
-            <label class="radio-card"><input type="radio" name="sizeMode" value="fit" checked><span><strong>Fit</strong><small>Scale each page to fit the selected paper</small></span></label>
-            <label class="radio-card"><input type="radio" name="sizeMode" value="actual"><span><strong>Actual size</strong><small>Print at 100% of the original page size</small></span></label>
-            <label class="radio-card"><input type="radio" name="sizeMode" value="shrink"><span><strong>Shrink oversized pages</strong><small>Reduce only pages larger than the paper</small></span></label>
-            <label class="radio-card"><input type="radio" name="sizeMode" value="custom"><span><strong>Custom scale</strong><small>Enter a percentage from 25% to 400%</small></span></label>
-            <div class="inline-field" style="padding-left: 28px; margin: -2px 0 8px;">
-              <input type="number" id="customScale" value="100" min="25" max="400" step="1" disabled aria-label="Custom scale percentage"><span>% of original size</span>
-            </div>
-            <label class="switch-row"><input type="checkbox" id="chooseSourceByPdf"><span>Choose paper source by PDF page size</span></label>
-          </div>
-
-          <div class="mode-panel" data-mode="poster" hidden>
-            <div class="grid-2">
-              <label class="field"><span>Tile scale (%)</span><input type="number" id="tileScale" value="100" min="10" max="400" step="5"></label>
-              <label class="field"><span>Overlap (inches)</span><input type="number" id="posterOverlap" value="0" min="0" max="2" step="0.05"></label>
-            </div>
-            <label class="switch-row"><input type="checkbox" id="cutMarks" checked><span>Print cut marks</span></label>
-            <label class="switch-row"><input type="checkbox" id="posterLabels"><span>Print tile labels</span></label>
-            <div class="mode-note"><span data-icon="info" data-icon-size="14"></span><span>One page is split across multiple sheets. Overlap helps align tiles when assembling the poster.</span></div>
-          </div>
-
-          <div class="mode-panel" data-mode="multiple" hidden>
-            <div class="grid-2">
-              <label class="field"><span>Pages per sheet</span>
-                <select id="pagesPerSheet">
-                  <option value="2">2-up</option>
-                  <option value="4" selected>4-up</option>
-                  <option value="6">6-up</option>
-                  <option value="8">8-up</option>
-                  <option value="9">9-up</option>
-                  <option value="12">12-up</option>
-                  <option value="16">16-up</option>
-                  <option value="custom">Custom…</option>
-                </select>
-              </label>
-              <label class="field"><span>Page order</span>
-                <select id="pageOrder">
-                  <option value="horizontal">Horizontal</option>
-                  <option value="horizontalReversed">Horizontal reversed</option>
-                  <option value="vertical">Vertical</option>
-                  <option value="verticalReversed">Vertical reversed</option>
-                </select>
-              </label>
-            </div>
-            <div class="grid-2" id="customNup" hidden>
-              <label class="field"><span>Columns</span><input type="number" id="customNupCols" value="2" min="1" max="8"></label>
-              <label class="field"><span>Rows</span><input type="number" id="customNupRows" value="2" min="1" max="8"></label>
-            </div>
-            <div class="grid-2">
-              <label class="field"><span>Gutter (mm)</span><input type="number" id="nupGutter" value="0" min="0" max="30"></label>
-              <label class="switch-row" style="align-self:end;padding-bottom:9px;"><input type="checkbox" id="nupBorder" checked><span>Page border</span></label>
-            </div>
-            <div class="mode-note"><span data-icon="grid" data-icon-size="14"></span><span>Great for handouts, revision sheets and reducing paper use. Maximum 16 pages per side.</span></div>
-          </div>
-
-          <div class="mode-panel" data-mode="booklet" hidden>
-            <div class="grid-2">
-              <label class="field"><span>Booklet subset</span>
-                <select id="bookletSubset">
-                  <option value="both">Both sides</option>
-                  <option value="front">Front side only</option>
-                  <option value="back">Back side only</option>
-                </select>
-              </label>
-              <label class="field"><span>Binding</span>
-                <select id="bookletBinding">
-                  <option value="left">Left binding</option>
-                  <option value="right">Right binding</option>
-                  <option value="leftTall">Left binding (tall)</option>
-                  <option value="rightTall">Right binding (tall)</option>
-                </select>
-              </label>
-            </div>
-            <label class="field"><span>Centre gutter (mm)</span><input type="number" id="bookletGutter" value="0" min="0" max="50"></label>
-            <label class="switch-row"><input type="checkbox" id="bookletFold" checked><span>Add fold / crease line in preview</span></label>
-            <div class="mode-note"><span data-icon="book" data-icon-size="14"></span><span>Pages are imposed in saddle-stitch order. Page count is rounded up to a multiple of four with blank pages.</span></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><h3>Orientation &amp; rotation</h3></div>
-          <div class="segmented" id="orientation" role="group" aria-label="Orientation">
-            <button data-value="auto" class="active">Auto-rotate</button>
-            <button data-value="portrait">Portrait</button>
-            <button data-value="landscape">Landscape</button>
-          </div>
-          <div class="field-hint mt-8" id="orientationHint">Auto-rotate turns pages to best fit each sheet.</div>
-        </div>
-      </div>
-
-      <!-- PRINTER TAB -->
-      <div class="tab-panel" id="tab-printer" role="tabpanel">
-        <div class="card">
-          <div class="card-head"><h3>Basic settings</h3><span class="badge accent">Canon driver</span></div>
-          <div class="grid-2">
-            <label class="field"><span>Page size</span>
-              <select id="pageSize">
-                <option value="A4" selected>A4 — 210 × 297 mm</option>
-                <option value="A3">A3 — 297 × 420 mm</option>
-                <option value="A5">A5 — 148 × 210 mm</option>
-                <option value="Letter">Letter — 8.5 × 11 in</option>
-                <option value="Legal">Legal — 8.5 × 14 in</option>
-              </select>
-            </label>
-            <label class="field"><span>Output size</span>
-              <select id="outputSize">
-                <option value="same">Match page size</option>
-                <option value="A4">A4</option>
-                <option value="A3">A3</option>
-                <option value="A5">A5</option>
-              </select>
-            </label>
-          </div>
-          <div class="grid-2">
-            <label class="field"><span>Copies (1–9999)</span><input type="number" id="copies" value="1" min="1" max="9999"></label>
-            <label class="field"><span>Resolution</span>
-              <select id="resolution">
-                <option value="600" selected>600 dpi</option>
-                <option value="1200">1200 dpi</option>
-              </select>
-            </label>
-          </div>
-          <label class="field"><span>Colour mode</span>
-            <select id="colorMode">
-              <option value="auto" selected>Auto colour / B&amp;W</option>
-              <option value="grayscale">Black &amp; white (grayscale)</option>
-              <option value="mono">Pure black &amp; white (high contrast)</option>
-            </select>
-          </label>
-          <div class="mode-note" id="colorHint"><span data-icon="palette" data-icon-size="14"></span><span>Colour pages are detected automatically for accurate pricing.</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><h3>Finishing &amp; duplex</h3></div>
-          <label class="field"><span>Print style</span>
-            <select id="printStyle">
-              <option value="1sided" selected>1-sided printing</option>
-              <option value="2sided">2-sided printing (duplex)</option>
-              <option value="booklet">Booklet printing</option>
-            </select>
-          </label>
-          <label class="field"><span>Binding location</span>
-            <select id="bindingLocation">
-              <option value="longEdgeLeft" selected>Long edge — left</option>
-              <option value="longEdgeRight">Long edge — right</option>
-              <option value="shortEdgeTop">Short edge — top</option>
-              <option value="shortEdgeBottom">Short edge — bottom</option>
-            </select>
-          </label>
-          <label class="field"><span>Staple &amp; collate</span>
-            <select id="stapleCollate">
-              <option value="collate" selected>Collate</option>
-              <option value="group">Group</option>
-              <option value="stapleCollate">Staple + collate</option>
-              <option value="ecoStaple">Eco staple-free + collate</option>
-            </select>
-          </label>
-          <div class="mode-note"><span data-icon="info" data-icon-size="14"></span><span>Stapling is applied per copy set. The operator confirms finisher settings before printing.</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><h3>Paper source &amp; quality</h3></div>
-          <label class="field"><span>Paper source</span>
-            <select id="paperSource">
-              <option value="auto" selected>Auto select</option>
-              <option value="drawer1">Drawer 1</option>
-              <option value="drawer2">Drawer 2</option>
-              <option value="drawer3">Drawer 3</option>
-              <option value="bypass">Multi-purpose tray</option>
-            </select>
-          </label>
-          <label class="field"><span>Paper type</span>
-            <select id="paperType">
-              <option value="plain" selected>Plain (64–105 gsm)</option>
-              <option value="recycled">Recycled</option>
-              <option value="heavy1">Heavy 1 (106–150 gsm)</option>
-              <option value="heavy2">Heavy 2 (151–220 gsm)</option>
-              <option value="photo">Photo paper</option>
-              <option value="transparency">Transparency</option>
-            </select>
-          </label>
-          <label class="field"><span>Objective</span>
-            <select id="objective">
-              <option value="general" selected>General</option>
-              <option value="publications">Publications</option>
-              <option value="graphics">Graphics</option>
-              <option value="vivid">Vivid photo</option>
-              <option value="cad">Designs / CAD</option>
-            </select>
-          </label>
-        </div>
-      </div>
-
-      <!-- PRESETS TAB -->
-      <div class="tab-panel" id="tab-presets" role="tabpanel">
-        <div class="card">
-          <div class="card-head"><h3>Quick presets</h3><span class="badge">1 click</span></div>
-          <div id="presetList" class="doc-list"></div>
-        </div>
-        <div class="card">
-          <div class="card-head"><h3>Save current settings</h3></div>
-          <label class="field"><span>Preset name</span><input type="text" id="presetName" placeholder="e.g. School handout 4-up" maxlength="40"></label>
-          <button class="btn soft block" id="savePresetBtn"><span data-icon="plus" data-icon-size="15"></span> Save preset</button>
-          <div class="field-hint mt-8">Presets are stored on this device and can be loaded in one tap.</div>
-        </div>
-        <div class="card">
-          <div class="card-head"><h3>Reset</h3></div>
-          <button class="btn ghost block" id="resetAllBtn"><span data-icon="refresh" data-icon-size="15"></span> Restore default settings</button>
-        </div>
+      <div class="footer-bottom">
+        <span id="footer-note">© 2026 AL SHAJAR STATIONERY. All rights reserved.</span>
+        <span>Prices in AED · UAE VAT 5% included · <span id="footer-address">United Arab Emirates</span></span>
       </div>
     </div>
-  </aside>
+  </footer>
 
-  <!-- ============================ PREVIEW ============================ -->
-  <section class="preview-panel panel" aria-label="Print preview">
-    <div class="preview-toolbar">
-      <div class="toolbar-group">
-        <button class="icon-btn" id="prevSheet" title="Previous sheet" aria-label="Previous sheet"><span data-icon="chevronLeft" data-icon-size="16"></span></button>
-        <span class="sheet-tracker" id="sheetTracker">Sheet 1 of 1</span>
-        <button class="icon-btn" id="nextSheet" title="Next sheet" aria-label="Next sheet"><span data-icon="chevronRight" data-icon-size="16"></span></button>
-      </div>
-      <div class="toolbar-group">
-        <span class="preview-badge" id="previewBadge">A4 · Portrait</span>
-        <button class="icon-btn" id="zoomOut" title="Zoom out" aria-label="Zoom out"><span data-icon="minus" data-icon-size="15"></span></button>
-        <button class="zoom-label" id="zoomLabel" title="Reset zoom">100%</button>
-        <button class="icon-btn" id="zoomIn" title="Zoom in" aria-label="Zoom in"><span data-icon="plus" data-icon-size="15"></span></button>
-        <button class="icon-btn" id="fitBtn" title="Fit to screen" aria-label="Fit to screen"><span data-icon="maximize" data-icon-size="15"></span></button>
-        <label class="switch-row compact" title="Force page content to fit inside the frame"><input type="checkbox" id="fitToFrame"><span>Fit picture to frame</span></label>
-        <button class="icon-btn" id="fullscreenBtn" title="Full screen preview" aria-label="Full screen preview"><span data-icon="maximize" data-icon-size="15"></span></button>
-      </div>
-    </div>
-
-    <div class="preview-stage" id="previewStage">
-      <div class="preview-empty" id="previewEmpty">
-        <div class="empty-illustration"><span data-icon="fileText" data-icon-size="48"></span></div>
-        <h2>Your print preview appears here</h2>
-        <p>Upload a PDF, Word, Excel or image file. Configure the layout on the left and watch every change render instantly on the sheet.</p>
-        <div class="empty-actions">
-          <button class="btn primary" id="emptyUploadBtn"><span data-icon="upload" data-icon-size="15"></span> Upload a file</button>
-          <button class="btn ghost" id="emptySampleBtn">Try the sample</button>
+  <!-- ============================== Assistant =========================== -->
+  <div class="assistant">
+    <div class="assistant-panel" id="assistant-panel" role="dialog" aria-modal="false" aria-labelledby="assistant-title" hidden>
+      <div class="assistant-head">
+        <span class="assistant-avatar" aria-hidden="true">SHS</span>
+        <div class="assistant-head-text">
+          <strong id="assistant-title">Print Assistant</strong>
+          <span>Ask me about prices, VAT or delivery</span>
         </div>
-        <div class="tour-hint">First time? <button id="emptyTourBtn">Take the 60-second tour →</button></div>
+        <button class="assistant-close" id="assistant-close" type="button" aria-label="Close assistant">
+          <svg aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
       </div>
-      <div class="paper-wrap" id="paperWrap" hidden>
-        <canvas id="previewCanvas" width="800" height="1131" aria-label="Print sheet preview"></canvas>
-        <div class="paper-corner" id="paperCorner">A4 · Sheet 1</div>
+      <div class="assistant-body" id="assistant-body" aria-live="polite"></div>
+      <div class="assistant-quick" id="assistant-quick">
+        <button type="button" data-question="How is the black and white price calculated?">B&amp;W price</button>
+        <button type="button" data-question="Is VAT included in the price?">VAT</button>
+        <button type="button" data-question="How much is home delivery?">Delivery</button>
+        <button type="button" data-question="What is 2-up and 4-up printing?">N-up layouts</button>
       </div>
-      <div class="preview-loading" id="previewLoading" hidden><span class="spinner"></span><span>Rendering preview…</span></div>
+      <form class="assistant-form" id="assistant-form">
+        <label class="sr-only" for="assistant-input">Ask the print assistant</label>
+        <input id="assistant-input" type="text" placeholder="Type your question…" autocomplete="off" maxlength="400">
+        <button type="submit" aria-label="Send question">
+          <svg aria-hidden="true"><use href="#i-send"></use></svg>
+        </button>
+      </form>
     </div>
 
-    <div class="filmstrip-wrap">
-      <div class="filmstrip-head"><span>Sheets</span><span id="sheetCountLabel">0 sheets</span></div>
-      <div class="filmstrip" id="filmstrip"></div>
-    </div>
-  </section>
+    <button class="assistant-fab" id="assistant-toggle" type="button" aria-expanded="false" aria-controls="assistant-panel">
+      <span class="fab-icon" aria-hidden="true"><svg><use href="#i-sparkles"></use></svg></span>
+      <span class="fab-label">Print Assistant</span>
+    </button>
+  </div>
 
-  <!-- ============================ SUMMARY ============================ -->
-  <aside class="summary-panel panel" aria-label="Job summary">
-    <div class="panel-head">
-      <h2>Job summary</h2>
-      <span class="badge" id="summaryBadge">Draft</span>
-    </div>
-    <div class="summary-scroll">
-      <div class="summary-hero">
-        <span class="summary-label">Estimated total</span>
-        <div class="summary-total" id="summaryTotal">0.000 OMR</div>
-        <span class="summary-sub" id="summarySub">Upload a document to begin</span>
-      </div>
-
-      <div class="stat-grid">
-        <div><span>Pages</span><strong id="statPages">0</strong></div>
-        <div><span>Sides</span><strong id="statSides">0</strong></div>
-        <div><span>Sheets</span><strong id="statSheets">0</strong></div>
-        <div><span>Est. time</span><strong id="statTime">—</strong></div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-card-head"><h3>Price breakdown</h3><button class="icon-btn" id="priceToggle" aria-label="Toggle price breakdown"><span data-icon="chevronUp" data-icon-size="14"></span></button></div>
-        <div id="priceLines" class="price-lines"></div>
-        <div class="price-footer">
-          <div><span>Subtotal</span><span id="priceSubtotal">0.000</span></div>
-          <div><span>VAT <span id="vatRate">5%</span></span><span id="priceVat">0.000</span></div>
-          <div class="total"><span>Total</span><span id="priceTotal">0.000 OMR</span></div>
+  <!-- =============================== Modals ============================= -->
+  <div class="modal" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-title" hidden>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <div>
+          <h2 id="terms-title">Terms &amp; Conditions</h2>
+          <p>AL SHAJAR STATIONERY · Smart Print Gateway</p>
         </div>
+        <button class="modal-close" type="button" data-close-modal aria-label="Close terms">
+          <svg aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
       </div>
+      <div class="modal-body">
+        <h3>1. Who we are</h3>
+        <p>This portal is operated by AL SHAJAR STATIONERY (SHS) in the United Arab Emirates. By sending a print job you agree to these terms.</p>
 
-      <div class="summary-card" id="servicesCard">
-        <div class="summary-card-head"><h3>Add-on services</h3><span class="badge">Optional</span></div>
-        <div class="extras-grid">
-          <label class="switch-row"><input type="checkbox" id="extraLamination"><span>Lamination</span></label>
-          <label class="switch-row"><input type="checkbox" id="extraCutting"><span>Cutting</span></label>
-          <label class="switch-row"><input type="checkbox" id="extraFolding"><span>Folding</span></label>
-          <label class="switch-row"><input type="checkbox" id="extraRush"><span>Rush service</span></label>
-        </div>
+        <h3>2. Prices and VAT</h3>
+        <p>All prices are in UAE Dirhams (AED) and already include 5% UAE VAT. VAT is never added on top of the amount shown. The receipt reverses the VAT for transparency.</p>
+        <ul>
+          <li>A4 and A5 black &amp; white: <strong>AED 1.00 per 8 pages, or part of 8</strong>, single- or double-sided. 9–16 pages cost AED 2.00.</li>
+          <li>A4 and A5 colour: <strong>AED 1.00 per page</strong>.</li>
+          <li>A3 black &amp; white: <strong>AED 2.00 per page</strong>; A3 colour: <strong>AED 3.00 per page</strong>.</li>
+          <li>Copies multiply the number of pages. Duplex and N-up change paper use, not the per-page price.</li>
+        </ul>
+
+        <h3>3. Delivery</h3>
+        <p>Home delivery is available within the UAE. Print orders of <strong>AED 50.00 or more</strong> qualify for free delivery; below that a delivery fee of <strong>AED 10.00</strong> applies. The current fee and threshold are always shown in the order summary before you send the job. You must provide a correct address and phone number.</p>
+
+        <h3>4. Payment</h3>
+        <p>No payment is taken online. Choose cash or card and pay at the counter on collection, or to the driver on delivery.</p>
+
+        <h3>5. Job review and refusal</h3>
+        <p>Our operators review every job before printing. We may reject a job if a file is unreadable, password-protected, contains unlawful or prohibited content, or infringes copyright. If a job is rejected, you will not be charged for it.</p>
+
+        <h3>6. Your responsibility</h3>
+        <p>Please check the live preview, page range, paper size, ink and copies carefully. Colours on screen may differ slightly from printed colours, and printer margins may trim very close edges. Once a job has been printed, we cannot refund customer errors such as the wrong file, page range or layout.</p>
+
+        <h3>7. Copyright</h3>
+        <p>You confirm that you own or have permission to reproduce every file you upload. You are responsible for any third-party rights in the content.</p>
+
+        <h3>8. File storage</h3>
+        <p>Uploaded files are stored on the shop computer only. Completed, rejected and cancelled jobs are automatically deleted after <strong>30 days</strong>, unless a different retention period is configured by the shop.</p>
+
+        <h3>9. Liability</h3>
+        <p>Our liability for any job is limited to the amount paid for that job. We are not liable for indirect losses.</p>
+
+        <h3>10. Contact</h3>
+        <p id="terms-contact">Please speak to the counter team for any question about these terms.</p>
       </div>
-
-      <div class="summary-card warnings-card">
-        <div class="summary-card-head"><h3>Smart checks</h3><span class="badge" id="warningCount">0</span></div>
-        <div class="warnings-list" id="warningsList">
-          <div class="warning-item info"><span data-icon="info" data-icon-size="13"></span><span>Add a document to run automatic checks.</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="summary-actions">
-      <button class="btn primary block lg" id="sendBtn" disabled><span data-icon="send" data-icon-size="17"></span> Send to print desk</button>
-      <button class="btn ghost block sm" id="exportBtn"><span data-icon="download" data-icon-size="14"></span> Export job JSON</button>
-      <p class="fineprint">Your files go only to this shop's local print desk. Nothing is uploaded to the cloud.</p>
-    </div>
-  </aside>
-</main>
-
-<div class="mobile-sendbar" id="mobileSendBar">
-  <div><div class="ms-label">Estimated total</div><div class="ms-total" id="msTotal">0.000 OMR</div></div>
-  <button class="btn primary" id="msReviewBtn"><span data-icon="send" data-icon-size="15"></span> Review &amp; send</button>
-</div>
-
-<!-- ============================ SEND MODAL ============================ -->
-<div class="modal-backdrop" id="sendModal" hidden>
-  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="sendTitle">
-    <div class="modal-head">
-      <div><h2 id="sendTitle">Review &amp; send to print desk</h2><p>Check the job, add your name, then send it for approval.</p></div>
-      <button class="modal-close" data-close="sendModal" aria-label="Close"><span data-icon="close"></span></button>
-    </div>
-    <div class="modal-body">
-      <div class="send-summary">
-        <div class="send-preview">
-          <canvas id="sendPreviewCanvas" width="300" height="424"></canvas>
-          <span class="caption" id="sendPreviewCaption">Sheet 1 preview</span>
-        </div>
-        <div class="send-details">
-          <div class="send-line"><span>Documents</span><span id="sendDocLine">—</span></div>
-          <div class="send-line"><span>Pages / sides</span><span id="sendPagesLine">—</span></div>
-          <div class="send-line"><span>Paper</span><span id="sendPaperLine">—</span></div>
-          <div class="send-line"><span>Layout</span><span id="sendLayoutLine">—</span></div>
-          <div class="send-line"><span>Finishing</span><span id="sendFinishLine">—</span></div>
-          <div class="send-line"><span>Colour</span><span id="sendColorLine">—</span></div>
-          <div class="send-line"><span>Copies</span><span id="sendCopiesLine">—</span></div>
-          <div class="send-line"><span>Estimated time</span><span id="sendTimeLine">—</span></div>
-          <div class="send-total"><span>Total incl. VAT</span><strong id="sendTotal">0.000 OMR</strong></div>
-        </div>
-      </div>
-
-      <div class="form-section-title">Contact details</div>
-      <div class="grid-2">
-        <label class="field"><span>Your name *</span><input type="text" id="customerName" placeholder="Name for the counter" maxlength="80" autocomplete="name"></label>
-        <label class="field"><span>Phone (optional)</span><input type="tel" id="customerPhone" placeholder="+968 …" maxlength="30" autocomplete="tel"></label>
-      </div>
-      <label class="field"><span>Note for the print team (optional)</span><textarea id="customerNote" placeholder="e.g. Please staple top-left, or call me when ready." maxlength="600"></textarea></label>
-
-      <div class="form-section-title">Print-ready preparation</div>
-      <label class="switch-row" style="margin-bottom:8px"><input type="checkbox" id="exactImposition" checked><span><strong style="color:var(--text)">Pre-impose exact sheets</strong> — render the layout you see into a print-ready PDF</span></label>
-      <div class="grid-2">
-        <label class="field"><span>Render quality</span>
-          <select id="impositionQuality">
-            <option value="120">Draft — 120 dpi (fast)</option>
-            <option value="150" selected>Standard — 150 dpi</option>
-            <option value="200">High — 200 dpi</option>
-            <option value="300">Maximum — 300 dpi (slow)</option>
-          </select>
-        </label>
-        <div class="field"><span>What this does</span><div class="field-hint" id="impositionNote">N-up, booklet, scaling and colour conversion are baked into the file so the printer matches the preview exactly.</div></div>
-      </div>
-
-      <div class="upload-status" id="sendProgressWrap" hidden>
-        <div class="row"><strong id="sendProgressText">Preparing your job…</strong><span id="sendProgressPct">0%</span></div>
-        <div class="progress-bar"><i id="sendProgressBar"></i></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close="sendModal">Back</button>
-      <div class="right">
-        <div style="text-align:right;margin-right:6px"><div class="ms-label">Total incl. VAT</div><strong id="sendTotalFoot" style="font-size:15px">0.000 OMR</strong></div>
-        <button class="btn primary" id="confirmSendBtn"><span data-icon="send" data-icon-size="16"></span> Send job</button>
+      <div class="modal-foot">
+        <button class="btn btn-primary" type="button" data-close-modal>I understand</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ============================ TRACKER MODAL ============================ -->
-<div class="modal-backdrop" id="trackerModal" hidden>
-  <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="trackerTitle">
-    <div class="modal-head">
-      <div><h2 id="trackerTitle">Job status</h2><p id="trackerSubtitle">Live updates from the print desk</p></div>
-      <button class="modal-close" data-close="trackerModal" aria-label="Close"><span data-icon="close"></span></button>
-    </div>
-    <div class="modal-body" id="trackerBody"></div>
-  </div>
-</div>
+  <div class="modal" id="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-title" hidden>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <div>
+          <h2 id="privacy-title">Privacy Policy</h2>
+          <p>How your files and details are handled</p>
+        </div>
+        <button class="modal-close" type="button" data-close-modal aria-label="Close privacy policy">
+          <svg aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h3>What we collect</h3>
+        <ul>
+          <li>Your name, mobile number, and — for delivery — your address.</li>
+          <li>Optional notes for the print desk.</li>
+          <li>The files you upload and the print options you choose.</li>
+          <li>Basic technical information needed to run the local service, such as your device address on the shop network.</li>
+        </ul>
 
-<!-- ============================ PASSWORD MODAL ============================ -->
-<div class="modal-backdrop" id="passwordModal" hidden>
-  <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="passwordTitle">
-    <div class="modal-head">
-      <div><h2 id="passwordTitle">Protected PDF</h2><p>This document needs a password before it can be previewed.</p></div>
-      <button class="modal-close" data-close="passwordModal" aria-label="Close"><span data-icon="close"></span></button>
-    </div>
-    <div class="modal-body">
-      <label class="field"><span>PDF password</span><input type="password" id="pdfPassword" placeholder="Enter password" autocomplete="off"></label>
-      <div class="field-hint error" id="pdfPasswordError" hidden>Incorrect password. Try again.</div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close="passwordModal">Skip file</button>
-      <div class="right"><button class="btn primary" id="pdfPasswordBtn">Unlock PDF</button></div>
-    </div>
-  </div>
-</div>
+        <h3>Why we collect it</h3>
+        <p>Only to review, print and hand over your job, and to deliver it when you choose home delivery. We do not use your information for advertising, profiling or automated decisions.</p>
 
-<!-- ============================ HISTORY DRAWER ============================ -->
-<div class="drawer-backdrop" id="historyDrawer" hidden>
-  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
-    <div class="drawer-head">
-      <div><h2 id="historyTitle">Your recent jobs</h2><p class="small faint">Stored on this device only</p></div>
-      <button class="modal-close" data-close="historyDrawer" aria-label="Close"><span data-icon="close"></span></button>
-    </div>
-    <div class="drawer-body" id="historyList"></div>
-    <div class="drawer-foot"><button class="btn ghost block" id="clearHistoryBtn"><span data-icon="trash" data-icon-size="14"></span> Clear history</button></div>
-  </div>
-</div>
+        <h3>Where it is stored</h3>
+        <p>Your files and details are stored on the shop’s own computer, not in a cloud service. This portal does not load third-party analytics, tracking pixels or advertising scripts. Fonts, PDF previews and QR codes are served locally.</p>
 
-<!-- ============================ CHATBOT ============================ -->
-<button class="chat-fab" id="chatFab" title="Print assistant" aria-label="Open print assistant">
-  <span data-icon="sparkles" data-icon-size="24"></span>
-  <span class="chat-ping"></span>
-</button>
-<div class="chat-panel" id="chatPanel" hidden>
-  <div class="chat-head">
-    <div class="chat-avatar"><span data-icon="bot" data-icon-size="18"></span></div>
-    <div><strong>Print Assistant</strong><small><span class="online-dot"></span>Online · knows this shop's settings</small></div>
-    <button class="icon-btn sm" id="chatClose" aria-label="Close assistant"><span data-icon="close" data-icon-size="15"></span></button>
-  </div>
-  <div class="chat-body" id="chatBody"></div>
-  <div class="chat-quick" id="chatQuick"></div>
-  <form class="chat-input-row" id="chatForm">
-    <input type="text" id="chatInput" placeholder="Ask about layout, pricing, files…" maxlength="500" autocomplete="off">
-    <button type="submit" id="chatSend" aria-label="Send message"><span data-icon="send" data-icon-size="16"></span></button>
-  </form>
-</div>
+        <h3>Who can see it</h3>
+        <p>Only the AL SHAJAR STATIONERY print staff who operate the PIN-protected console. If you request delivery, the driver receives the address and phone number needed to complete the delivery.</p>
 
-<!-- ============================ TOUR ============================ -->
-<div class="tour-overlay" id="tourOverlay" hidden>
-  <div class="tour-spot" id="tourSpot"></div>
-  <div class="tour-tip" id="tourTip">
-    <div class="tour-step" id="tourStep">Step 1 of 6</div>
-    <h3 id="tourTitle">Welcome</h3>
-    <p id="tourText"></p>
-    <div class="tour-actions">
-      <div class="tour-dots" id="tourDots"></div>
-      <button class="btn ghost sm" id="tourSkip">Skip</button>
-      <button class="btn primary sm" id="tourNext">Next</button>
+        <h3>How long we keep it</h3>
+        <p>Completed, rejected and cancelled jobs are automatically deleted after <strong>30 days</strong>. Active jobs remain until they are finished. You can ask the counter to delete a job earlier.</p>
+
+        <h3>Security</h3>
+        <p>The operator console is protected by a PIN and signed, HTTP-only session cookies. The service is designed to run on the shop’s local network. We still recommend that you do not upload sensitive documents you would not normally hand to a print shop.</p>
+
+        <h3>Your choices</h3>
+        <p>You can ask staff to view, correct or delete your job details and files. You can also choose store pickup to avoid providing a delivery address.</p>
+
+        <h3>Contact</h3>
+        <p id="privacy-contact">Please speak to the counter team for any privacy request.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary" type="button" data-close-modal>Close</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="toast-stack" id="toasts"></div>
+  <div class="modal" id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title" hidden>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <div>
+          <h2 id="success-title">Job sent</h2>
+          <p>Keep your job number to track progress.</p>
+        </div>
+        <button class="modal-close" type="button" data-close-modal aria-label="Close job status">
+          <svg aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="success-hero">
+          <span class="success-check" aria-hidden="true"><svg><use href="#i-check"></use></svg></span>
+          <h3>We have your job</h3>
+          <p>Our print desk will review it and start printing. This page updates automatically while it stays open.</p>
+        </div>
 
-<script src="/shared/pricing.js"></script>
-<script src="/shared/pdf-builder.js"></script>
-<script src="/shared/sample-pdf.js"></script>
-<script src="/assets/vendor/pdf.min.js"></script>
-<script src="/assets/js/icons.js"></script>
-<script src="/assets/js/ui.js"></script>
-<script src="/assets/js/documents.js"></script>
-<script src="/assets/js/preview.js"></script>
-<script src="/assets/js/chatbot.js"></script>
-<script src="/assets/js/app.js"></script>
+        <div class="job-ticket">
+          <div class="job-ticket-head">
+            <div>
+              <div class="jt-label">Job number</div>
+              <div class="jt-id" id="success-id">—</div>
+            </div>
+            <span class="pill pill-gold" id="success-status-pill">Pending</span>
+          </div>
+          <div class="job-ticket-body">
+            <div class="jt-row"><span>Total to pay</span><strong id="success-total">AED 0.00</strong></div>
+            <div class="jt-row"><span>Payment</span><strong id="success-payment">Cash</strong></div>
+            <div class="jt-row"><span>Collection</span><strong id="success-fulfilment">Store pickup</strong></div>
+            <div class="jt-row"><span>Queue position</span><strong id="success-queue">1</strong></div>
+          </div>
+        </div>
+
+        <p class="job-status-message" id="success-message">
+          <svg aria-hidden="true"><use href="#i-info"></use></svg>
+          <span>We received your job. Our team will check it shortly.</span>
+        </p>
+
+        <div class="status-track" id="success-track">
+          <div class="track-step is-current" data-step="pending">
+            <span class="track-dot">1</span>
+            <div class="track-body">
+              <div class="track-title">Received</div>
+              <div class="track-desc">Your files are on the shop computer.</div>
+            </div>
+          </div>
+          <div class="track-step" data-step="printing">
+            <span class="track-dot">2</span>
+            <div class="track-body">
+              <div class="track-title">Printing</div>
+              <div class="track-desc">The operator accepted the job and sent it to the Canon printer.</div>
+            </div>
+          </div>
+          <div class="track-step" data-step="completed">
+            <span class="track-dot">3</span>
+            <div class="track-body">
+              <div class="track-title" id="success-final-title">Ready</div>
+              <div class="track-desc" id="success-final-desc">Collect at the counter and quote your job number.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button class="btn btn-primary" type="button" id="success-new-job">Send another job</button>
+          <button class="btn btn-outline" type="button" id="success-cancel" hidden>Cancel job</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="/shared/pricing.js"></script>
+  <script src="/shared/layout.js"></script>
+  <script src="/assets/vendor/pdf.min.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/preview.js"></script>
+  <script src="/assets/js/assistant.js"></script>
+  <script src="/assets/js/portal.js"></script>
 </body>
 </html>
