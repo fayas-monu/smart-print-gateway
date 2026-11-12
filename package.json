@@ -1,8 +1,8 @@
 {
-  "name": "smart-print-gateway",
-  "version": "2.0.0",
+  "name": "al-shajar-smart-print-gateway",
+  "version": "1.0.0",
   "private": true,
-  "description": "Enterprise-grade smart print gateway and shop automation system for Canon imageRUNNER ADVANCE printers. Zero runtime dependencies.",
+  "description": "AL SHAJAR STATIONERY Smart Print Gateway — LAN print portal and operator console for Canon imageRUNNER ADVANCE printers. Zero runtime dependencies.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -14,12 +14,14 @@
     "node": ">=18.0.0"
   },
   "keywords": [
+    "al-shajar",
+    "stationery",
     "print",
     "canon",
-    "print-shop",
-    "pdf",
-    "queue",
-    "automation"
+    "uae",
+    "aed",
+    "vat",
+    "print-shop"
   ],
   "license": "MIT"
 }
